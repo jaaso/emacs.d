@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: functionComponentWithStyles
+# key: fcs
+# --
+import React from 'react';
+import withStyles from '@material-ui/core/styles/withStyles';
+import styles from './styles'
+
+const ${1:Component} = (props) => {};
+
+export default withStyles(styles)(${1:Component});

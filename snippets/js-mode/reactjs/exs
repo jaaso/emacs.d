@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: exportStyles
+# key: exs
+# --
+const styles = () => ({
+});
+
+export default styles;

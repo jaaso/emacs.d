@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: withStyles import
+# key: mws
+# group: imports
+# --
+
+import withStyles from '@material-ui/core/styles/withStyles';

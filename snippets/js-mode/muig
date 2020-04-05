@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: import mui Grid
+# key: muig
+# group: imports
+# --
+
+
+import Grid from '@material-ui/core/Grid/Grid';
