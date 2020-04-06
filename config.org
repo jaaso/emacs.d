@@ -197,104 +197,104 @@ Now here is the actual code for the minibuffer part (=icomplete= is
 further below):
 
 #+begin_src emacs-lisp
-(use-package minibuffer
-  :config
-  (setq completion-cycle-threshold 3)
-  (setq completion-flex-nospace nil)
-  (setq completion-pcm-complete-word-inserts-delimiters t)
-  (setq completion-pcm-word-delimiters "-_./:| ")
-  ;; NOTE: flex completion is introduced in Emacs 27
-  (setq completion-show-help nil)
-  (setq completion-styles '(partial-completion substring initials flex))
-  (setq completion-category-overrides
-        '((file (styles initials basic))
-          (buffer (styles initials basic))
-          (info-menu (styles basic))))
-  (setq completions-format 'vertical)   ; *Completions* buffer
-  (setq enable-recursive-minibuffers t)
-  (setq read-answer-short t)
-  (setq read-buffer-completion-ignore-case t)
-  (setq read-file-name-completion-ignore-case t)
-  (setq resize-mini-windows t)
+  (use-package minibuffer
+    :config
+    (setq completion-cycle-threshold 3)
+    (setq completion-flex-nospace nil)
+    (setq completion-pcm-complete-word-inserts-delimiters t)
+    (setq completion-pcm-word-delimiters "-_./:| ")
+    ;; NOTE: flex completion is introduced in Emacs 27
+    (setq completion-show-help nil)
+    (setq completion-styles '(partial-completion substring initials flex))
+    (setq completion-category-overrides
+	  '((file (styles initials basic))
+	    (buffer (styles initials basic))
+	    (info-menu (styles basic))))
+    (setq completions-format 'vertical)   ; *Completions* buffer
+    (setq enable-recursive-minibuffers t)
+    (setq read-answer-short t)
+    (setq read-buffer-completion-ignore-case t)
+    (setq read-file-name-completion-ignore-case t)
+    (setq resize-mini-windows t)
 
-  (file-name-shadow-mode 1)
-  (minibuffer-depth-indicate-mode 1)
-  (minibuffer-electric-default-mode 1)
+    (file-name-shadow-mode 1)
+    (minibuffer-depth-indicate-mode 1)
+    (minibuffer-electric-default-mode 1)
 
-  (add-hook 'minibuffer-setup-hook (lambda () (setq truncate-lines nil)))
+    (add-hook 'minibuffer-setup-hook (lambda () (setq truncate-lines nil)))
 
-  (defun prot/focus-minibuffer ()
-    "Focus the active minibuffer.
+    (defun prot/focus-minibuffer ()
+      "Focus the active minibuffer.
 
-Bind this to `completion-list-mode-map' to M-v to easily jump
-between the list of candidates present in the \\*Completions\\*
-buffer and the minibuffer (because by default M-v switches to the
-completions if invoked from inside the minibuffer."
-    (interactive)
-    (let ((mini (active-minibuffer-window)))
-      (when mini
-        (select-window mini))))
+  Bind this to `completion-list-mode-map' to M-v to easily jump
+  between the list of candidates present in the \\*Completions\\*
+  buffer and the minibuffer (because by default M-v switches to the
+  completions if invoked from inside the minibuffer."
+      (interactive)
+      (let ((mini (active-minibuffer-window)))
+	(when mini
+	  (select-window mini))))
 
-  (defun prot/focus-minibuffer-or-completions ()
-    "Focus the active minibuffer or the \\*Completions\\*.
+    (defun prot/focus-minibuffer-or-completions ()
+      "Focus the active minibuffer or the \\*Completions\\*.
 
-If both the minibuffer and the Completions are present, this
-command will first move per invocation to the former, then the
-latter, and then continue to switch between the two.
+  If both the minibuffer and the Completions are present, this
+  command will first move per invocation to the former, then the
+  latter, and then continue to switch between the two.
 
-The continuous switch is essentially the same as running
-`prot/focus-minibuffer' and `switch-to-completions' in
-succession."
-    (interactive)
-    (let* ((mini (active-minibuffer-window))
-           (completions (get-buffer-window "*Completions*")))
-      (cond ((and mini
-                  (not (minibufferp)))
-             (select-window mini nil))
-            ((and completions
-                  (not (eq (selected-window)
-                           completions)))
-             (select-window completions nil)))))
+  The continuous switch is essentially the same as running
+  `prot/focus-minibuffer' and `switch-to-completions' in
+  succession."
+      (interactive)
+      (let* ((mini (active-minibuffer-window))
+	     (completions (get-buffer-window "*Completions*")))
+	(cond ((and mini
+		    (not (minibufferp)))
+	       (select-window mini nil))
+	      ((and completions
+		    (not (eq (selected-window)
+			     completions)))
+	       (select-window completions nil)))))
 
-  (defun prot/describe-symbol-at-point (&optional arg)
-    "Get help (documentation) for the symbol at point.
+    (defun prot/describe-symbol-at-point (&optional arg)
+      "Get help (documentation) for the symbol at point.
 
-With a prefix argument, switch to the \\*Help\\* window.  If that
-is already focused, switch to the most recently used window
-instead."
-    (interactive "P")
-    (let ((symbol (symbol-at-point)))
-      (when symbol
-        (describe-symbol symbol)))
-    (when current-prefix-arg
-      (let ((help (get-buffer-window "*Help*")))
-        (when help
-          (if (not (eq (selected-window) help))
-              (select-window help)
-            (select-window (get-mru-window)))))))
+  With a prefix argument, switch to the \\*Help\\* window.  If that
+  is already focused, switch to the most recently used window
+  instead."
+      (interactive "P")
+      (let ((symbol (symbol-at-point)))
+	(when symbol
+	  (describe-symbol symbol)))
+      (when current-prefix-arg
+	(let ((help (get-buffer-window "*Help*")))
+	  (when help
+	    (if (not (eq (selected-window) help))
+		(select-window help)
+	      (select-window (get-mru-window)))))))
 
-  ;; Defines, among others, aliases for common actions to Super-KEY.
-  ;; Normally these should go in individual package declarations, but
-  ;; their grouping here makes things easier to understand.
-  :bind (("s-f" . find-file)
-         ("s-F" . find-file-other-window)
-         ("s-d" . dired)
-         ("s-D" . dired-other-window)
-         ("s-b" . switch-to-buffer)
-         ("s-B" . switch-to-buffer-other-window)
-         ("s-h" . prot/describe-symbol-at-point)
-         ("s-H" . (lambda ()
-                      (interactive)
-                      (let ((current-prefix-arg t))
-                        (prot/describe-symbol-at-point))))
-         ("s-v" . prot/focus-minibuffer-or-completions)
-         :map completion-list-mode-map
-         ("h" . prot/describe-symbol-at-point)
-         ("n" . next-line)
-         ("p" . previous-line)
-         ("f" . next-completion)
-         ("b" . previous-completion)
-         ("M-v" . prot/focus-minibuffer)))
+    ;; Defines, among others, aliases for common actions to Super-KEY.
+    ;; Normally these should go in individual package declarations, but
+    ;; their grouping here makes things easier to understand.
+    :bind (("s-f" . find-file)
+	   ("s-F" . find-file-other-window)
+	   ("s-d" . dired)
+	   ("s-D" . dired-other-window)
+	   ("s-b" . switch-to-buffer)
+	   ("s-B" . switch-to-buffer-other-window)
+	   ("s-h" . prot/describe-symbol-at-point)
+	   ("s-H" . (lambda ()
+			(interactive)
+			(let ((current-prefix-arg t))
+			  (prot/describe-symbol-at-point))))
+	   ("s-v" . prot/focus-minibuffer-or-completions)
+	   :map completion-list-mode-map
+	   ("h" . prot/describe-symbol-at-point)
+	   ("n" . next-line)
+	   ("p" . previous-line)
+	   ("f" . next-completion)
+	   ("b" . previous-completion)
+	   ("M-v" . prot/focus-minibuffer)))
 #+end_src
 
 And the following package declaration is for the interactive completion
@@ -348,10 +348,10 @@ not work as intended.
   (setq icomplete-with-completion-tables t)
   (setq icomplete-in-buffer t)
 
-  (setq completion-ignore-case t)       ; case insensitive completion
+  (setq completion-ignore-case nil)       ; case insensitive completion
 
-  (fido-mode 1)                        ; Emacs 27.1
-  ;; (icomplete-mode 1)
+  (fido-mode -1)                        ; Emacs 27.1
+  (icomplete-mode 1)
 
   (defun prot/icomplete-force-complete-and-exit ()
     "Complete the current `icomplete' match and exit the minibuffer.
@@ -492,6 +492,7 @@ inside a given location."
     :PROPERTIES:
     :CUSTOM_ID: h:98876022-57cc-40de-936e-4ee42cefd69a
     :END:
+
 **** Dabbrev and hippie-expand (dynamic word completion)
      :PROPERTIES:
      :CUSTOM_ID: h:57dcf193-0c4e-4ee6-9b2d-6892558b0a84
@@ -500,12 +501,6 @@ inside a given location."
 This is Emacs' own approach to text completion inside the buffer:
 "dynamic abbreviation" and the corresponding "do what I mean" wrapper
 called =hippie-expand=.  The latter is a superset of =dabbrev=.
-
-After trying the popular third-party "Company" package, I felt that it
-does not offer me much of an added value, while its popup feature
-detracted from the otherwise frugal aesthetics of my setup.  Whereas
-Dabbrev works in a way I find intuitive enough, while it remains
-minimalist in its presentation.
 
 To learn about =hippie-expand-try-functions-list=, read the introductory
 remarks in =M-x find-library RET hippie-exp RET=.  The =M-/= is bound by
@@ -528,6 +523,7 @@ To check what I have on regular expressions, see further below my
 configurations and documentation for [[#h:6c6759c8-3ae3-40b0-8356-05cc0975e12a][re-builder and visual-regexp]].
 
 #+begin_src emacs-lisp
+
 (use-package dabbrev
   :commands (dabbrev-expand dabbrev-completion)
   :config
@@ -719,14 +715,14 @@ effectively supersede the functionality of =anzu=, a package I once used.
   (setq isearch-yank-on-move 'shift)
   (setq isearch-allow-scroll 'unlimited)
 
-  (defun prot/isearch-mark-and-exit ()
+  (defun me/isearch-mark-and-exit ()
     "Mark the current search string and exit the search."
     (interactive)
     (push-mark isearch-other-end t 'activate)
     (setq deactivate-mark nil)
     (isearch-done))
 
-  (defun prot/isearch-other-end ()
+  (defun me/isearch-other-end ()
     "End current search in the opposite side of the match.
 Particularly useful when the match does not fall within the
 confines of word boundaries (e.g. multiple words)."
@@ -735,7 +731,7 @@ confines of word boundaries (e.g. multiple words)."
     (when isearch-other-end
       (goto-char isearch-other-end)))
 
-  (defun prot/isearch-abort ()
+  (defun me/isearch-abort ()
     "Remove non-matching `isearch' input, reverting to previous
 successful search and continuing with the search.
 
@@ -748,20 +744,20 @@ afterwards exit the search altogether."
       (isearch-pop-state))
     (isearch-update))
 
-  (defun prot/isearch-query-replace-symbol-at-point ()
+  (defun me/isearch-query-replace-symbol-at-point ()
     "Run `query-replace-regexp' for the symbol at point."
     (interactive)
     (isearch-forward-symbol-at-point)
     (isearch-query-replace-regexp))
 
   :bind (("M-s M-o" . multi-occur)
-         ("M-s %" . prot/isearch-query-replace-symbol-at-point)
+         ("M-s %" . me/isearch-query-replace-symbol-at-point)
          :map minibuffer-local-isearch-map
          ("M-/" . isearch-complete-edit)
          :map isearch-mode-map
          ("M-/" . isearch-complete)
-         ("C-SPC" . prot/isearch-mark-and-exit)
-         ("DEL" . prot/isearch-abort)
+         ("C-SPC" . me/isearch-mark-and-exit)
+         ("DEL" . me/isearch-abort)
          ("<C-return>" . prot/isearch-other-end)))
 #+end_src
 
@@ -788,117 +784,34 @@ this style as the default.  Other options are =string= and =rx=.
   (setq reb-re-syntax 'read))
 #+end_src
 
-Another option (though the two are not mutually exclusive) is to use
-the third-party package =visual-regexp=.  This one is meant as a drop-in
-replacement for =query-replace= (and the regexp variant).  I prefer not
-to use it that way, but only invoke it via =M-x= when I need to test a
-regular expression that I would then replace with something else.  The
-major upside of this tool is that it highlights groups individually
-and offers a live preview of the replacement, making it absolutely
-great when dealing with complex sets of regexp constructs.
-
-#+begin_src emacs-lisp
-(use-package visual-regexp
-  :ensure t
-  :config
-  (setq vr/default-replace-preview nil)
-  (setq vr/match-separator-use-custom-face t))
-#+end_src
-
-*** wgrep (writable grep)
-   :PROPERTIES:
-   :CUSTOM_ID: h:42624165-f4cb-4318-abce-c11232426880
-   :END:
-
-With =wgrep= we can directly edit the results of a =grep= and save the
-changes to all affected buffers.  In principle, this is the same as what
-the built-in =occur= offers.  We can use it to operate on a list of
-matches by leveraging the full power of Emacs' editing capabilities
-(e.g. keyboard macros, multiple cursors…).
-
-#+begin_src emacs-lisp
-(use-package wgrep
-  :ensure t
-  :config
-  (setq wgrep-auto-save-buffer t)
-  (setq wgrep-change-readonly-file t))
-#+end_src
-
-*** ripgrep (rg.el)
+*** Ag
     :PROPERTIES:
     :CUSTOM_ID: h:31622bf2-526b-4426-9fda-c0fc59ac8f4b
     :END:
 
-This is a package that allows us to interface with the external command
-line program called "ripgrep".  My [[https://protesilaos.com/codelog/2020-03-25-emacs-ripgrep-rg/][video demo of rg.el]] (2020-03-25)
-covers the main features of this tool.
-
-What I find particularly appealing about =rg.el= is that it follows the
-interface paradigms of built-in Emacs functions, such as =grep= or =occur=.
-With regard to the latter, it even uses the same key to convert the
-results' buffer into an editable one: =e= (the ability to write changes is
-provided by the =wgrep= package that [[#h:42624165-f4cb-4318-abce-c11232426880][I define right above]]).
-
-Furthermore, =rg.el= interfaces with =ibuffer=, another built-in package, to
-list saved searches (see my =prot/rg-save-search-as-name= in the package
-declaration below).  Saved searches are regular buffers.  You can switch
-to any of them the normal way.
-
-While inside of an =rg.el= buffer, hit =m= to produce a transient menu from
-where you can refine your search.  This works just like =magit=.  In
-addition, you can consult the universal =C-h m= for documentation
-concerning the major mode you are in.
-
-Concerning the key bindings for navigating the results buffer, I find
-that the standard motions should retain their general function, while
-moving between file headings can be done with =M-{n,p}=.
-
-=rg.el= is designed in such a way that it offers useful functionality
-without depending on a particular completion framework (e.g. Ivy, Helm).
-I consider this an advantage, especially when combined with the overall
-alignment of this package with standard Emacs tools.
-
-Also see my configurations for [[#h:7862f39e-aed0-4d02-9f1e-60c4601a9734][project-related commands]].
-
 #+begin_src emacs-lisp
-(use-package rg
+(use-package ag
   :ensure t
-  :after wgrep
   :config
-  (setq rg-group-result t)
-  (setq rg-hide-command t)
-  (setq rg-show-columns nil)
-  (setq rg-show-header t)
-  (setq rg-custom-type-aliases nil)
-  (setq rg-default-alias-fallback "all")
 
-  (rg-define-search prot/grep-vc-or-dir
-    :query ask
-    :format regexp
-    :files "everything"
-    :dir (let ((vc (vc-root-dir)))
-           (if vc
-               vc                         ; search root project dir
-             default-directory))          ; or from the current dir
-    :confirm prefix
-    :flags ("--hidden -g !.git"))
+  (setq ag-reuse-buffers nil)
+  (setq ag-reuse-window t)
+  (setq ag-highlight-search t)
 
-  (defun prot/rg-save-search-as-name ()
-    "Save `rg' buffer, naming it after the current search query.
-
-This function is meant to be mapped to a key in `rg-mode-map'."
-    (interactive)
-    (let ((pattern (car rg-pattern-history)))
-      (rg-save-search-as-name (concat "«" pattern "»"))))
-
-  :bind (("M-s g" . prot/grep-vc-or-dir)
-         :map rg-mode-map
-         ("s" . prot/rg-save-search-as-name)
-         ("C-n" . next-line)
-         ("C-p" . previous-line)
-         ("M-n" . rg-next-file)
-         ("M-p" . rg-prev-file)))
+  :bind (("M-s g" . ag-project)))
 #+end_src
+*** dumb jump
+#+BEGIN_SRC emacs-lisp
+(use-package dumb-jump
+  :bind (("M-g o" . dumb-jump-go-other-window)
+         ("M-g j" . dumb-jump-go)
+         ("M-g b" . dumb-jump-back)
+         ("M-g i" . dumb-jump-go-prompt)
+         ("M-g x" . dumb-jump-go-prefer-external)
+         ("M-g z" . dumb-jump-go-prefer-external-other-window))
+  :config (setq dumb-jump-force-searcher 'ag)
+  :ensure)
+#+END_SRC
 
 * Directory, buffer, window management
   :PROPERTIES:
@@ -943,12 +856,6 @@ This function is meant to be mapped to a key in `rg-mode-map'."
         '("-ls" . "-AFhlv --group-directories-first"))
   (setq find-name-arg "-iname"))
 
-(use-package async
-  :ensure t)
-
-(use-package dired-async
-  :after (dired async)
-  :hook (dired-mode . dired-async-mode))
 #+end_src
 
 ** Working with buffers
@@ -1084,17 +991,6 @@ set elsewhere in this document to 72 characters long.
           overlong-summary-line)))
 #+end_src
 
-*** Git time machine
-    :PROPERTIES:
-    :CUSTOM_ID: h:d91ae6cb-433e-4efa-9580-07c5a59e5e29
-    :END:
-
-#+begin_src emacs-lisp
-(use-package git-timemachine
-  :ensure t
-  :commands git-timemachine)
-#+end_src
-
 * General interface and interactions
   :PROPERTIES:
   :CUSTOM_ID: h:b6bd2eea-8269-4029-b446-ee340c12ebc3
@@ -1105,70 +1001,13 @@ set elsewhere in this document to 72 characters long.
    :CUSTOM_ID: h:8fc1f9ca-f5ae-407a-b721-aab414ca657b
    :END:
 
-*** Flycheck (code linting)
-    :PROPERTIES:
-    :CUSTOM_ID: h:b8bfcc05-c0d3-4093-b3fe-f06187d22c6a
-    :END:
-
-This is a great tool for identifying errors or inconsistencies in
-programming syntax.  I used it for my Modus themes (defined elsewhere in
-this document) to make the necessary checks for code quality, in
-preparation of their release as a MELPA package.
-
-This package provides a broad range of customisation options, with many
-items targeting specific programming languages and/or style conventions.
-It seems very powerful!  As these targeted operations require some more
-research, I leave everything to its default value and will be updating
-the package declaration over time.
-
-#+begin_src emacs-lisp
-(use-package flycheck
-  :ensure t
-  :commands flycheck-mode
-  :config
-  (setq flycheck-check-syntax-automatically
-        '(save mode-enabled)))
-#+end_src
-
-Also offer a Flycheck indicator in the mode line.
-
-#+begin_src emacs-lisp
-(use-package flycheck-indicator
-  :ensure t
-  :after flycheck
-  :hook (flycheck-mode . flycheck-indicator-mode))
-#+end_src
-
-There is also a built-in tool that covers Flycheck's niche, but I find
-its functionality somewhat more limited.  As such I am defining it so
-that an autoload will be created for it (meaning that it will only be
-made available on demand).
-
-#+begin_src emacs-lisp
-(use-package flymake
-  :commands flymake-mode)
-#+end_src
-
-*** Markdown support
-    :PROPERTIES:
-    :CUSTOM_ID: h:7e0416c0-3acc-4748-9eca-4dd4da11d79b
-    :END:
-
-I edit lots of Markdown files.  This makes things easier.
-
-#+begin_src emacs-lisp
-(use-package markdown-mode
-  :ensure t
-  :mode ("\\.md\\'" . markdown-mode))
-#+end_src
-
-*** yasnippet
+*** flymake
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-    :ensure t
-    :diminish
+(use-package flymake
     :config
-    (yas-global-mode 1))
+    (define-key flymake-mode-map (kbd "C-c ! l") 'flymake-show-diagnostics-buffer)
+    (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
+    :hook (js-mode . flymake-mode))
 #+END_SRC
 *** JavaScript
 
@@ -1176,50 +1015,28 @@ I edit lots of Markdown files.  This makes things easier.
   (use-package js
     :ensure nil
     :custom
-    (js-indent-level 2))
+    (js-indent-level 2)
+    :config
+    (defun prettier-js-on-buffer ()
+      (interactive)
+      (shell-command-on-buffer "prettier --write --single-quote --print-width=120 --trailing-comma=all"))
 
-  (use-package json-mode
-    :ensure t
-    :mode "\\.json\\'"
-    :preface
-    (defun me/json-set-indent-level ()
-      (setq-local js-indent-level 2))
-    :hook (json-mode . me/json-set-indent-level))
+      (add-hook 'js-mode-hook
+	  (lambda ()
+	    (add-hook 'after-save-hook #'prettier-js-on-buffer nil 'local))))
 
-  (use-package js-import
+  (use-package flymake-eslint
     :ensure t
-    :bind (("C-c i" . js-import)))
+    :config
+    (add-hook 'js-mode-hook
+		   (lambda () (flymake-eslint-enable))))
 
   (use-package flow-minor-mode
     :ensure t
     :config
     (add-hook 'js-mode-hook 'flow-minor-mode))
-
-  (use-package prettier-js
-    :ensure t
-    :config
-
-    (setq prettier-js-args '(
-                             "--trailing-comma" "all"
-                             "--single-quote" "true"
-                             "--print-width" "120"
-                             ))
-
-    (add-hook 'js-mode-hook 'prettier-js-mode))
-
-  (use-package jest
-    :ensure t
-    :config
-    (setq jest-executable "yarn test --coverage=false --verbose=false")
-    (setq jest-pdb-track nil)
-    (eval-after-load 'js
-      '(define-key js-mode-map (kbd "C-c t t") 'jest-file)))
-
-  (use-package nvm :ensure t)
 #+END_SRC
 *** Python
-
-- *TODO*: Fix for =ipython= 5.1.0.
 
 #+BEGIN_SRC emacs-lisp
 (use-package elpy
@@ -1241,18 +1058,7 @@ I edit lots of Markdown files.  This makes things easier.
   :hook (python-mode . turn-on-prettify-symbols-mode)
   :config
   (elpy-enable)
-  (when (executable-find "ipython")
-    (setq-default
-     python-shell-interpreter "ipython"
-     python-shell-interpreter-args "--colors=Linux --profile=default --simple-prompt"
-     python-shell-prompt-output-regexp "Out\\[[0-9]+\\]: "
-     python-shell-prompt-regexp "In \\[[0-9]+\\]: "
-     python-shell-completion-setup-code
-     "from IPython.core.completerlib import module_completion"
-     python-shell-completion-module-string-code
-     "';'.join(module_completion('''%s'''))\n"
-     python-shell-completion-string-code
-     "';'.join(get_ipython().Completer.all_completions('''%s'''))\n")))
+  )
 
 #+END_SRC
 *** Clojure
@@ -1261,9 +1067,6 @@ I edit lots of Markdown files.  This makes things easier.
 (use-package cider
   :ensure t
   :config
-  ;; autocompletion
-  (require 'company)
-
   ;; REPL related stuff
 
   ;; REPL history file
@@ -1289,11 +1092,7 @@ I edit lots of Markdown files.  This makes things easier.
 
 
   ;; error buffer not popping up
-  (setq cider-show-error-buffer nil)
-
-  ;; company mode for completion
-  (add-hook 'cider-repl-mode-hook #'company-mode)
-  (add-hook 'cider-mode-hook #'company-mode))
+  (setq cider-show-error-buffer nil))
 
 #+END_SRC
 *** Ocaml
@@ -1308,16 +1107,11 @@ I edit lots of Markdown files.  This makes things easier.
                     ("\\.topml$" . tuareg-mode))
                   auto-mode-alist)))
 
-  ;; Merlin configuration
-
   (use-package merlin
     :ensure t
     :config
     (add-hook 'tuareg-mode-hook 'merlin-mode)
-    (add-hook 'merlin-mode-hook #'company-mode)
     (setq merlin-error-after-save nil))
-
-  ;; utop configuration
 
   (use-package utop
     :ensure t
@@ -1325,125 +1119,6 @@ I edit lots of Markdown files.  This makes things easier.
     (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
     (add-hook 'tuareg-mode-hook 'utop-minor-mode)
     )
-
-  (use-package emacs
-    :config
-    (defun opam-shell-command-to-string (command)
-      "Similar to shell-command-to-string, but returns nil unless the process
-     returned 0, and ignores stderr (shell-command-to-string ignores return value)"
-      (let* ((return-value 0)
-             (return-string
-              (with-output-to-string
-                (setq return-value
-                      (with-current-buffer standard-output
-                        (process-file shell-file-name nil '(t nil) nil
-                                      shell-command-switch command))))))
-        (if (= return-value 0) return-string nil)))
-
-    (defun opam-update-env (switch)
-      "Update the environment to follow current OPAM switch configuration"
-      (interactive
-       (list
-        (let ((default
-                (car (split-string (opam-shell-command-to-string "opam switch show --safe")))))
-          (completing-read
-           (concat "opam switch (" default "): ")
-           (split-string (opam-shell-command-to-string "opam switch list -s --safe") "\n")
-           nil t nil nil default))))
-      (let* ((switch-arg (if (= 0 (length switch)) "" (concat "--switch " switch)))
-             (command (concat "opam config env --safe --sexp " switch-arg))
-             (env (opam-shell-command-to-string command)))
-        (when (and env (not (string= env "")))
-          (dolist (var (car (read-from-string env)))
-            (setenv (car var) (cadr var))
-            (when (string= (car var) "PATH")
-              (setq exec-path (split-string (cadr var) path-separator)))))))
-
-    (opam-update-env nil)
-
-    (defvar opam-share
-      (let ((reply (opam-shell-command-to-string "opam config var share --safe")))
-        (when reply (substring reply 0 -1))))
-
-    (add-to-list 'load-path (concat opam-share "/emacs/site-lisp"))
-    ;; OPAM-installed tools automated detection and initialisation
-
-    (defun opam-setup-tuareg ()
-      (add-to-list 'load-path (concat opam-share "/tuareg") t)
-      (load "tuareg-site-file"))
-
-    (defun opam-setup-add-ocaml-hook (h)
-      (add-hook 'tuareg-mode-hook h t)
-      (add-hook 'caml-mode-hook h t))
-
-    (defun opam-setup-complete ()
-      (if (require 'company nil t)
-          (opam-setup-add-ocaml-hook
-           (lambda ()
-             (company-mode)
-             (defalias 'auto-complete 'company-complete)))
-        (require 'auto-complete nil t)))
-
-    (defun opam-setup-ocp-indent ()
-      (opam-setup-complete)
-      (autoload 'ocp-setup-indent "ocp-indent" "Improved indentation for Tuareg mode")
-      (autoload 'ocp-indent-caml-mode-setup "ocp-indent" "Improved indentation for Caml mode")
-      (add-hook 'tuareg-mode-hook 'ocp-setup-indent t)
-      (add-hook 'caml-mode-hook 'ocp-indent-caml-mode-setup  t))
-
-    (defun opam-setup-ocp-index ()
-      (autoload 'ocp-index-mode "ocp-index" "OCaml code browsing, documentation and completion based on build artefacts")
-      (opam-setup-add-ocaml-hook 'ocp-index-mode))
-
-    (defun opam-setup-merlin ()
-      (opam-setup-complete)
-      (require 'merlin)
-      (opam-setup-add-ocaml-hook 'merlin-mode)
-
-      (defcustom ocp-index-use-auto-complete nil
-        "Use auto-complete with ocp-index (disabled by default by opam-user-setup because merlin is in use)"
-        :group 'ocp_index)
-      (defcustom merlin-ac-setup 'easy
-        "Use auto-complete with merlin (enabled by default by opam-user-setup)"
-        :group 'merlin-ac)
-
-      ;; So you can do it on a mac, where `C-<up>` and `C-<down>` are used
-      ;; by spaces.
-      (define-key merlin-mode-map
-        (kbd "C-c <up>") 'merlin-type-enclosing-go-up)
-      (define-key merlin-mode-map
-        (kbd "C-c <down>") 'merlin-type-enclosing-go-down)
-      (set-face-background 'merlin-type-face "skyblue"))
-
-    (defun opam-setup-utop ()
-      (autoload 'utop "utop" "Toplevel for OCaml" t)
-      (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
-      (add-hook 'tuareg-mode-hook 'utop-minor-mode))
-
-    (defvar opam-tools
-      '(("tuareg" . opam-setup-tuareg)
-        ("ocp-indent" . opam-setup-ocp-indent)
-        ("ocp-index" . opam-setup-ocp-index)
-        ("merlin" . opam-setup-merlin)
-        ("utop" . opam-setup-utop)))
-
-    (defun opam-detect-installed-tools ()
-      (let*
-          ((command "opam list --installed --short --safe --color=never")
-           (names (mapcar 'car opam-tools))
-           (command-string (mapconcat 'identity (cons command names) " "))
-           (reply (opam-shell-command-to-string command-string)))
-        (when reply (split-string reply))))
-
-    (defvar opam-tools-installed (opam-detect-installed-tools))
-
-    (defun opam-auto-tools-setup ()
-      (interactive)
-      (dolist (tool opam-tools)
-        (when (member (car tool) opam-tools-installed)
-          (funcall (symbol-function (cdr tool))))))
-
-    (opam-auto-tools-setup))
 #+END_SRC
 
 ** Custom movements and motions
@@ -1498,225 +1173,234 @@ I edit lots of Markdown files.  This makes things easier.
     :END:
 
 #+begin_src emacs-lisp
-(use-package emacs
-  :config
-  (defun me/copy-line ()
-    "Copies the entirety of the current line."
-    (interactive)
-    (copy-region-as-kill (point-at-bol) (point-at-eol))
-    (message "Current line copied"))
+  (use-package emacs
+    :config
+    (defun shell-command-on-buffer (command)
+      "run a command on the current file and revert the buffer"
+      (interactive "sCommand:")
+      (shell-command
+       (format "%s %s"
+	       command
+	       (shell-quote-argument (buffer-file-name))))
+      (revert-buffer t t t))
 
-  (defun me/delete-pair-backward ()
-    "Delete pair of characters before point.
+    (defun me/copy-line ()
+      "Copies the entirety of the current line."
+      (interactive)
+      (copy-region-as-kill (point-at-bol) (point-at-eol))
+      (message "Current line copied"))
 
-Use the character right before point as a reference on what to
-match for deletion."
-    (interactive)
-    (delete-pair -1))
+    (defun me/delete-pair-backward ()
+      "Delete pair of characters before point.
 
-  (defun me/insert-double-quotes (&optional arg)
-    "Insert a pair of double quotes or wrap ARG with them."
-    (interactive "P")
-    (insert-pair arg ?\" ?\"))
+  Use the character right before point as a reference on what to
+  match for deletion."
+      (interactive)
+      (delete-pair -1))
 
-  (defun me/insert-double-smart-quotes (&optional arg)
-    "Insert a pair of double smart quotes or wrap ARG with them."
-    (interactive "P")
-    (insert-pair arg ?\“ ?\”))
+    (defun me/insert-double-quotes (&optional arg)
+      "Insert a pair of double quotes or wrap ARG with them."
+      (interactive "P")
+      (insert-pair arg ?\" ?\"))
 
-  (defun me/insert-single-smart-quotes (&optional arg)
-    "Insert a pair of single smart quotes or wrap ARG with them."
-    (interactive "P")
-    (insert-pair arg ?\‘ ?\’))
+    (defun me/insert-double-smart-quotes (&optional arg)
+      "Insert a pair of double smart quotes or wrap ARG with them."
+      (interactive "P")
+      (insert-pair arg ?\“ ?\”))
 
-  (defun me/insert-elisp-quotes (&optional arg)
-    "Insert a pair of elisp symbol quotes or wrap ARG with them."
-    (interactive "P")
-    (insert-pair arg ?\` ?\'))
+    (defun me/insert-single-smart-quotes (&optional arg)
+      "Insert a pair of single smart quotes or wrap ARG with them."
+      (interactive "P")
+      (insert-pair arg ?\‘ ?\’))
 
-  (defun me/multi-line-next ()
-    "Moves point 15 lines down."
-    (interactive)
-    (forward-line 15))
+    (defun me/insert-elisp-quotes (&optional arg)
+      "Insert a pair of elisp symbol quotes or wrap ARG with them."
+      (interactive "P")
+      (insert-pair arg ?\` ?\'))
 
-  (defun me/multi-line-prev ()
-    "Moves point 15 lines up."
-    (interactive)
-    (forward-line -15))
+    (defun me/multi-line-next ()
+      "Moves point 15 lines down."
+      (interactive)
+      (forward-line 15))
 
-  (defun me/kill-line-backward ()
-    "Kill from point to the beginning of the line."
-    (interactive)
-    (kill-line 0))
+    (defun me/multi-line-prev ()
+      "Moves point 15 lines up."
+      (interactive)
+      (forward-line -15))
 
-  (defun me/new-line-below ()
-    "Create a new line below the current one.  Move the point to
-the absolute beginning.  Also see `me/new-line-above'."
-    (interactive)
-    (end-of-line)
-    (newline))
+    (defun me/kill-line-backward ()
+      "Kill from point to the beginning of the line."
+      (interactive)
+      (kill-line 0))
 
-  (defun me/new-line-above ()
-    "Create a new line above the current one.  Move the point to
-the absolute beginning.  Also see `me/new-line-below'."
-    (interactive)
-    (beginning-of-line)
-    (newline)
-    (forward-line -1))
+    (defun me/new-line-below ()
+      "Create a new line below the current one.  Move the point to
+  the absolute beginning.  Also see `me/new-line-above'."
+      (interactive)
+      (end-of-line)
+      (newline))
 
-  (defun contrib/rename-file-and-buffer ()
-    "Rename current buffer and if the buffer is visiting a file, rename it too."
-    (interactive)
-    (let ((filename (buffer-file-name)))
-      (if (not (and filename (file-exists-p filename)))
-          (rename-buffer (read-from-minibuffer "New name: " (buffer-name)))
-        (let* ((new-name (read-from-minibuffer "New name: " filename))
-               (containing-dir (file-name-directory new-name)))
-          (make-directory containing-dir t)
-          (cond
-           ((vc-backend filename) (vc-rename-file filename new-name))
-           (t
-            (rename-file filename new-name t)
-            (set-visited-file-name new-name t t)))))))
+    (defun me/new-line-above ()
+      "Create a new line above the current one.  Move the point to
+  the absolute beginning.  Also see `me/new-line-below'."
+      (interactive)
+      (beginning-of-line)
+      (newline)
+      (forward-line -1))
 
-  (defun me/transpose-chars ()
-    "Always transposes the two characters before point.  There is
-no 'dragging' the character forward.  This is the behaviour of
-`transpose-chars' when point is at end-of-line."
-    (interactive)
-    (transpose-chars -1)
-    (forward-char))
+    (defun contrib/rename-file-and-buffer ()
+      "Rename current buffer and if the buffer is visiting a file, rename it too."
+      (interactive)
+      (let ((filename (buffer-file-name)))
+	(if (not (and filename (file-exists-p filename)))
+	    (rename-buffer (read-from-minibuffer "New name: " (buffer-name)))
+	  (let* ((new-name (read-from-minibuffer "New name: " filename))
+		 (containing-dir (file-name-directory new-name)))
+	    (make-directory containing-dir t)
+	    (cond
+	     ((vc-backend filename) (vc-rename-file filename new-name))
+	     (t
+	      (rename-file filename new-name t)
+	      (set-visited-file-name new-name t t)))))))
 
-  (defun me/transpose-or-swap-lines (arg)
-    "If region is active, swap the line at mark (region
-beginning) with the one at point (region end).  This leverages a
-facet of the built-in `transpose-lines'.  Otherwise transpose the
-current line with the one before it ('drag' line downward)."
-    (interactive "p")
-    (if (use-region-p)
-        (transpose-lines 0)
-      (transpose-lines arg)))
+    (defun me/transpose-chars ()
+      "Always transposes the two characters before point.  There is
+  no 'dragging' the character forward.  This is the behaviour of
+  `transpose-chars' when point is at end-of-line."
+      (interactive)
+      (transpose-chars -1)
+      (forward-char))
 
-  (defun me/transpose-or-swap-paragraphs (arg)
-    "If region is active, swap the paragraph at mark (region
-beginning) with the one at point (region end).  This leverages a
-facet of the built-in `transpose-paragraphs'.  Otherwise
-transpose the current paragraph with the one after it ('drag'
-paragraph downward)."
-    (interactive "p")
-    (if (use-region-p)
-        (transpose-paragraphs 0)
-      (transpose-paragraphs arg)))
-
-  (defun me/transpose-or-swap-sentences (arg)
-    "If region is active, swap the sentence at mark (region
-beginning) with the one at point (region end).  This leverages a
-facet of the built-in `transpose-sentences'.  Otherwise transpose
-the sentence before point with the one after it ('drag' sentence
-forward/downward).  Also `fill-paragraph' afterwards.
-
-Note that, by default, sentences are demarcated by two spaces."
-    (interactive "p")
-    (if (use-region-p)
-        (transpose-sentences 0)
-      (transpose-sentences arg))
-    (fill-paragraph))
-
-  (defun me/transpose-or-swap-words (arg)
-    "If region is active, swap the word at mark (region
-beginning) with the one at point (region end).
-
-Otherwise, and while inside a sentence, this behaves as the
-built-in `transpose-words', dragging forward the word behind the
-point.  The difference lies in its behaviour at the end of a
-line, where it will always transpose the word at point with the
-one behind it (effectively the last two words).
-
-This addresses two patterns of behaviour I dislike in the
-original command:
-
-1. When a line follows, `M-t' will transpose the last word of the
-line at point with the first word of the line below.
-
-2. While at the end of the line, `M-t' will not transpose the
-last two words, but will instead move point one word backward.
-To actually transpose the last two words, you need to invoke the
-command twice."
-    (interactive "p")
-    (if (use-region-p)
-        (transpose-words 0)
-      (if (eq (point) (point-at-eol))
-          (progn
-            (backward-word 1)
-            (transpose-words 1)
-            (forward-char 1))
-        (transpose-words arg))))
-
-  (defun me/unfill-region-or-paragraph (&optional region)
-    "Join all lines in a region, if active, while respecting any
-empty lines (so multiple paragraphs are not joined, just
-unfilled).  If no region is active, operate on the paragraph.
-The idea is to produce the opposite effect of both
-`fill-paragraph' and `fill-region'."
-    (interactive)
-    (let ((fill-column most-positive-fixnum))
+    (defun me/transpose-or-swap-lines (arg)
+      "If region is active, swap the line at mark (region
+  beginning) with the one at point (region end).  This leverages a
+  facet of the built-in `transpose-lines'.  Otherwise transpose the
+  current line with the one before it ('drag' line downward)."
+      (interactive "p")
       (if (use-region-p)
-          (fill-region (region-beginning) (region-end))
-        (fill-paragraph nil region))))
+	  (transpose-lines 0)
+	(transpose-lines arg)))
 
-  (defun me/yank-replace-line-or-region ()
-    "Replace the line at point with the contents of the last
-stretch of killed text.  If the region is active, operate over it
-instead.  This command can then be followed by the standard
-`yank-pop' (default is bound to M-y)."
-    (interactive)
-    (if (use-region-p)
-        (progn
-          (delete-region (region-beginning) (region-end))
-          (yank))
-      (delete-region (point-at-bol) (point-at-eol))
-      (yank)))
-  (defun my-delete-word (arg)
-  "Delete characters forward until encountering the end of a word.
-With argument, do this that many times.
-This command does not push erased text to kill-ring."
-  (interactive "p")
-  (delete-region (point) (progn (forward-word arg) (point))))
+    (defun me/transpose-or-swap-paragraphs (arg)
+      "If region is active, swap the paragraph at mark (region
+  beginning) with the one at point (region end).  This leverages a
+  facet of the built-in `transpose-paragraphs'.  Otherwise
+  transpose the current paragraph with the one after it ('drag'
+  paragraph downward)."
+      (interactive "p")
+      (if (use-region-p)
+	  (transpose-paragraphs 0)
+	(transpose-paragraphs arg)))
 
-(defun my-backward-delete-word (arg)
-  "Delete characters backward until encountering the beginning of a word.
-With argument, do this that many times.
-This command does not push erased text to kill-ring."
-  (interactive "p")
-  (my-delete-word (- arg)))
+    (defun me/transpose-or-swap-sentences (arg)
+      "If region is active, swap the sentence at mark (region
+  beginning) with the one at point (region end).  This leverages a
+  facet of the built-in `transpose-sentences'.  Otherwise transpose
+  the sentence before point with the one after it ('drag' sentence
+  forward/downward).  Also `fill-paragraph' afterwards.
+
+  Note that, by default, sentences are demarcated by two spaces."
+      (interactive "p")
+      (if (use-region-p)
+	  (transpose-sentences 0)
+	(transpose-sentences arg))
+      (fill-paragraph))
+
+    (defun me/transpose-or-swap-words (arg)
+      "If region is active, swap the word at mark (region
+  beginning) with the one at point (region end).
+
+  Otherwise, and while inside a sentence, this behaves as the
+  built-in `transpose-words', dragging forward the word behind the
+  point.  The difference lies in its behaviour at the end of a
+  line, where it will always transpose the word at point with the
+  one behind it (effectively the last two words).
+
+  This addresses two patterns of behaviour I dislike in the
+  original command:
+
+  1. When a line follows, `M-t' will transpose the last word of the
+  line at point with the first word of the line below.
+
+  2. While at the end of the line, `M-t' will not transpose the
+  last two words, but will instead move point one word backward.
+  To actually transpose the last two words, you need to invoke the
+  command twice."
+      (interactive "p")
+      (if (use-region-p)
+	  (transpose-words 0)
+	(if (eq (point) (point-at-eol))
+	    (progn
+	      (backward-word 1)
+	      (transpose-words 1)
+	      (forward-char 1))
+	  (transpose-words arg))))
+
+    (defun me/unfill-region-or-paragraph (&optional region)
+      "Join all lines in a region, if active, while respecting any
+  empty lines (so multiple paragraphs are not joined, just
+  unfilled).  If no region is active, operate on the paragraph.
+  The idea is to produce the opposite effect of both
+  `fill-paragraph' and `fill-region'."
+      (interactive)
+      (let ((fill-column most-positive-fixnum))
+	(if (use-region-p)
+	    (fill-region (region-beginning) (region-end))
+	  (fill-paragraph nil region))))
+
+    (defun me/yank-replace-line-or-region ()
+      "Replace the line at point with the contents of the last
+  stretch of killed text.  If the region is active, operate over it
+  instead.  This command can then be followed by the standard
+  `yank-pop' (default is bound to M-y)."
+      (interactive)
+      (if (use-region-p)
+	  (progn
+	    (delete-region (region-beginning) (region-end))
+	    (yank))
+	(delete-region (point-at-bol) (point-at-eol))
+	(yank)))
+    (defun my-delete-word (arg)
+      "Delete characters forward until encountering the end of a word.
+  With argument, do this that many times.
+  This command does not push erased text to kill-ring."
+      (interactive "p")
+      (delete-region (point) (progn (forward-word arg) (point))))
+
+    (defun my-backward-delete-word (arg)
+      "Delete characters backward until encountering the beginning of a word.
+  With argument, do this that many times.
+  This command does not push erased text to kill-ring."
+      (interactive "p")
+      (my-delete-word (- arg)))
 
 
-  :bind (("<C-f2>" . contrib/rename-file-and-buffer)
-         ("C-S-w" . me/copy-line)
-         ("M-=" . count-words)
-         ("<C-delete>" . delete-pair)
-         ("<C-backspace>" . me/delete-pair-backward)
-         ("M-\"" . me/insert-double-quotes)
-         ("C-M-\"" . me/insert-double-smart-quotes)
-         ("C-M-'" . me/insert-single-smart-quotes)
-         ("M-`" . me/insert-elisp-quotes)
-         ("s-k" . kill-this-buffer)
-         ("M-k" . me/kill-line-backward)
-         ("C-S-n" . me/multi-line-next)
-         ("C-S-p" . me/multi-line-prev)
-         ("<C-return>" . me/new-line-below)
-         ("<C-S-return>" . me/new-line-above)
-         ("M-SPC" . cycle-spacing)
-         ("M-o" . delete-blank-lines)
-         ("C-t" . me/transpose-chars)
-         ("C-x C-t" . me/transpose-or-swap-lines)
-         ("C-S-t" . me/transpose-or-swap-paragraphs)
-         ("C-x M-t" . me/transpose-or-swap-sentences)
-         ("M-t" . me/transpose-or-swap-words)
-         ("M-Q" . me/unfill-region-or-paragraph)
-         ("C-S-y" . me/yank-replace-line-or-region)
-	 ("M-d" . my-delete-word)
-	 ("M-<backspace>" . my-backward-delete-word)))
+    :bind (("<C-f2>" . contrib/rename-file-and-buffer)
+	   ("C-S-w" . me/copy-line)
+	   ("M-=" . count-words)
+	   ("<C-delete>" . delete-pair)
+	   ("<C-backspace>" . me/delete-pair-backward)
+	   ("M-\"" . me/insert-double-quotes)
+	   ("C-M-\"" . me/insert-double-smart-quotes)
+	   ("C-M-'" . me/insert-single-smart-quotes)
+	   ("M-`" . me/insert-elisp-quotes)
+	   ("s-k" . kill-this-buffer)
+	   ("M-k" . me/kill-line-backward)
+	   ("C-S-n" . me/multi-line-next)
+	   ("C-S-p" . me/multi-line-prev)
+	   ("<C-return>" . me/new-line-below)
+	   ("<C-S-return>" . me/new-line-above)
+	   ("M-SPC" . cycle-spacing)
+	   ("M-o" . delete-blank-lines)
+	   ("C-t" . me/transpose-chars)
+	   ("C-x C-t" . me/transpose-or-swap-lines)
+	   ("C-S-t" . me/transpose-or-swap-paragraphs)
+	   ("C-x M-t" . me/transpose-or-swap-sentences)
+	   ("M-t" . me/transpose-or-swap-words)
+	   ("M-Q" . me/unfill-region-or-paragraph)
+	   ("C-S-y" . me/yank-replace-line-or-region)
+	   ("M-d" . my-delete-word)
+	   ("M-<backspace>" . my-backward-delete-word)))
 #+end_src
 
 *** Move lines and faster navigation
@@ -1886,11 +1570,7 @@ mouse over an actionable item:
    :PROPERTIES:
    :CUSTOM_ID: h:271c9122-280b-424e-98f0-af9e4f09bbdb
    :END:
-*** Diminish
-#+BEGIN_SRC emacs-lisp
-(use-package diminish
-  :ensure t)
-#+END_SRC
+
 *** Preserve contents of system clipboard
     :PROPERTIES:
     :CUSTOM_ID: h:9eae0d2a-eef1-4b14-b883-39094be4de71

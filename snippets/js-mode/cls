@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: classNames import
-# key: cls
-# group: imports
-# --
-
-import classNames from 'classnames';
