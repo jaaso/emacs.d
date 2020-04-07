@@ -207,7 +207,7 @@ further below):
     (setq completion-show-help nil)
     (setq completion-styles '(partial-completion substring initials flex))
     (setq completion-category-overrides
-	  '((file (styles initials basic))
+	  '((file (styles initials basic flex))
 	    (buffer (styles initials basic))
 	    (info-menu (styles basic))))
     (setq completions-format 'vertical)   ; *Completions* buffer
@@ -348,7 +348,7 @@ not work as intended.
   (setq icomplete-with-completion-tables t)
   (setq icomplete-in-buffer t)
 
-  (setq completion-ignore-case nil)       ; case insensitive completion
+  (setq completion-ignore-case t)       ; case insensitive completion
 
   (fido-mode -1)                        ; Emacs 27.1
   (icomplete-mode 1)
@@ -571,33 +571,43 @@ front.  Also note that wherever you see =" _ "= it signifies the
 position of the cursor after the skeleton has been inserted.
 
 #+begin_src emacs-lisp
-(use-package abbrev
-  :delight
-  :config
-  (setq abbrev-file-name "~/.emacs.d/abbrevs")
-  (setq only-global-abbrevs nil)
+  (use-package abbrev
+    :delight
+    :config
+    (setq abbrev-file-name "~/.emacs.d/abbrevs")
+    (setq only-global-abbrevs nil)
 
-  ;;;;;;;;;;;;;;;;;;;;;;
-  ;; simple skeletons ;;
-  ;;;;;;;;;;;;;;;;;;;;;;
-  (define-skeleton protesilaos-com-skeleton
-    "Adds a link to my website while prompting for a possible
-  extension."
-    "Insert website extension: "
-    "https://protesilaos.com/" str "")
-  (define-abbrev global-abbrev-table "meweb"
-    "" 'protesilaos-com-skeleton)
+    (clear-abbrev-table global-abbrev-table)
 
-  (define-skeleton protesilaos-gitlab-skeleton
-    "Adds a link to my GitLab account while prompting for a
-  possible extension.  Makes it easy to link to my various git
-  repos."
-    "Website extension: "
-    "https://gitlab.com/protesilaos/" str "")
-  (define-abbrev global-abbrev-table "megit"
-    "" 'protesilaos-gitlab-skeleton)
-  :hook ((text-mode . abbrev-mode)
-         (git-commit-mode . abbrev-mode)))
+    (define-abbrev-table 'global-abbrev-table
+      '(
+	;; net abbrev
+	("afaik" "as far as i know" )
+	("atm" "at the moment" )
+	("dfb" "difference between" )
+	("ty" "thank you" )
+	("ui" "user interface" )
+	("uns" "understand" )
+	("ur" "you are" )
+	("btw" "by the way" )
+	))
+
+    ;; define abbrev for specific major mode
+    ;; the first part of the name should be the value of the variable major-mode of that mode
+    ;; e.g. for js-mode, name should be js-mode-abbrev-table
+
+    (when (boundp 'js-mode-abbrev-table)
+      (clear-abbrev-table js-mode-abbrev-table))
+
+    (define-abbrev-table 'js-mode-abbrev-table
+      '(
+          ("clg" "console.log();" c-electric-continued-statement 0)
+	  ("dbg" "debugger;" c-electric-continued-statement 0)
+	))
+
+    (set-default 'abbrev-mode nil)
+
+    (setq save-abbrevs nil))
 #+end_src
 
 ** Configurations for—or extensions to—built-in search commands
