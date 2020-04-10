@@ -5,7 +5,7 @@
   :PROPERTIES:
   :CUSTOM_ID: h:4d42f3e3-e96f-4125-a819-0544a21d45f3
   :END:
-** Sane defaultsa
+** Sane defaults
 #+begin_src emacs-lisp
   (use-package emacs
     :config
@@ -66,6 +66,9 @@
 
     ;; turn on highlight matching brackets when cursor is on one
     (show-paren-mode 1)
+
+    (global-set-key "\C-x\C-m" 'execute-extended-command)
+    (global-set-key "\C-c\C-m" 'execute-extended-command)
 
     (setq use-file-dialog nil)
     (setq use-dialog-box t)               ; only for mouse events
@@ -839,32 +842,48 @@ this style as the default.  Other options are =string= and =rx=.
 
 
 #+begin_src emacs-lisp
-(use-package dired
-  :config
-  (setq dired-recursive-copies 'always)
-  (setq dired-recursive-deletes 'always)
-  (setq delete-by-moving-to-trash t)
-  ;;(setq dired-listing-switches "-AFhlv --group-directories-first")
-  (setq dired-dwim-target t)
-  :hook ((dired-mode . dired-hide-details-mode)
-         (dired-mode . hl-line-mode)))
+  (use-package dired
+    :config
+    (setq dired-recursive-copies 'always)
+    (setq dired-recursive-deletes 'always)
+    (setq delete-by-moving-to-trash t)
+    ;;(setq dired-listing-switches "-AFhlv --group-directories-first")
+    (setq dired-dwim-target t)
+    :hook ((dired-mode . dired-hide-details-mode)
+	   (dired-mode . hl-line-mode)))
 
-(use-package dired-aux
-  :config
-  (setq dired-isearch-filenames 'dwim)
-  ;; The following variables were introduced in Emacs 27.1
-  (setq dired-create-destination-dirs 'ask)
-  (setq dired-vc-rename-file t)
-  :bind (:map dired-mode-map
-              ("C-c +" . dired-create-empty-file)
-              ("M-s f" . nil)))
+  (use-package dired-aux
+    :config
+    (setq dired-isearch-filenames 'dwim)
+    ;; The following variables were introduced in Emacs 27.1
+    (setq dired-create-destination-dirs 'ask)
+    (setq dired-vc-rename-file t)
+    :bind (:map dired-mode-map
+		("C-c +" . dired-create-empty-file)
+		("M-s f" . nil)))
 
-(use-package find-dired
-  :after dired
-  :config
-  (setq find-ls-option
-        '("-ls" . "-AFhlv --group-directories-first"))
-  (setq find-name-arg "-iname"))
+  (use-package find-dired
+    :after dired
+    :config
+    (setq find-ls-option
+	  '("-ls" . "-AFhlv --group-directories-first"))
+    (setq find-name-arg "-iname"))
+
+  (use-package dired-subtree
+    :ensure t
+    :config
+    (defun me/show-project-explorer ()
+      "Project dired buffer on the side of the frame.
+  Shows the projectile root folder using dired on the left side of
+  the frame and makes it a dedicated window for that buffer."
+      (interactive)
+      (let ((buffer (dired-noselect (cdr (project-current)))))
+	(progn
+	  (display-buffer-in-side-window buffer '((side . left) (window-width . 0.2)))
+	  (set-window-dedicated-p (get-buffer-window buffer) t))))
+
+    :bind (("<f7>" . me/show-project-explorer))
+)
 
 #+end_src
 
@@ -1031,15 +1050,15 @@ set elsewhere in this document to 72 characters long.
       (interactive)
       (shell-command-on-buffer "prettier --write --single-quote --print-width=120 --trailing-comma=all"))
 
-      (add-hook 'js-mode-hook
-	  (lambda ()
-	    (add-hook 'after-save-hook #'prettier-js-on-buffer nil 'local))))
+    (add-hook 'js-mode-hook
+	      (lambda ()
+		(add-hook 'after-save-hook 'prettier-js-on-buffer nil 'local))))
 
   (use-package flymake-eslint
     :ensure t
     :config
     (add-hook 'js-mode-hook
-		   (lambda () (flymake-eslint-enable))))
+	      (lambda () (flymake-eslint-enable))))
 
   (use-package flow-minor-mode
     :ensure t
