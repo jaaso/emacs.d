@@ -13,8 +13,11 @@
 
     (setq gc-cons-threshold 100000000)
 
-    ;; increase the amount of data which Emacs reads from the process. Again the emacs default is too low 4k considering that the some of the language server responses are in 800k - 3M range.
+    ;; increase the amount of data which Emacs reads from the process. Again the emacs default is too low
+    ;; 4k considering that the some of the language server responses are in 800k - 3M range.
     (setq read-process-output-max (* 1024 1024)) ;; 1mb
+
+    (setq lsp-prefer-capf t)
 
     ;; The default Ediff behavior is confusing and not desirable. This fixes it.
     (setq ediff-window-setup-function 'ediff-setup-windows-plain
@@ -49,8 +52,8 @@
     (setq custom-safe-themes t)
     (load-theme 'darkula t)
 
-    (setq default-frame-alist '((font . "Inconsolata LGC-14")))
-    (set-frame-font "Inconsolata LGC-14" nil t)
+    (setq default-frame-alist '((font . "Inconsolata LGC-13")))
+    (set-frame-font "Inconsolata LGC-13" nil t)
 
     ;; command as option on mac
     (setq mac-option-key-is-meta nil
@@ -60,12 +63,15 @@
 	  mac-control-modifier 'control
 	  mac-option-modifier 'super)
 
-    (menu-bar-mode 1)
+    (menu-bar-mode -1)
     (tool-bar-mode -1)
     (scroll-bar-mode -1)
 
     ;; turn on highlight matching brackets when cursor is on one
     (show-paren-mode 1)
+
+    (setq ring-bell-function 'ignore)
+
 
     (global-set-key "\C-x\C-m" 'execute-extended-command)
     (global-set-key "\C-c\C-m" 'execute-extended-command)
@@ -496,6 +502,32 @@ inside a given location."
     :CUSTOM_ID: h:98876022-57cc-40de-936e-4ee42cefd69a
     :END:
 
+**** Company mode
+#+BEGIN_SRC emacs-lisp
+(use-package company
+  :ensure t
+  :config
+  (setq company-tooltip-align-annotations t)
+  ;; Reduce the number of characters before company kicks in
+  (setq company-minimum-prefix-length 1)
+  ;; Disable automatic popup for completion
+  ;; (setq company-idle-delay nil)
+
+  ;; Reconfigure company to not use M-p and M-n for autocomplete navigation
+  (with-eval-after-load 'company
+    (define-key company-active-map (kbd "C-n") 'company-select-next)
+    (define-key company-active-map (kbd "C-p") 'company-select-previous)
+    (define-key company-search-map (kbd "C-n") 'company-select-next)
+    (define-key company-search-map (kbd "C-p") 'company-select-previous)
+    (define-key company-search-map (kbd "C-t") 'company-search-toggle-filtering))
+
+  ;; Set Control-. as autocomplete shortcut
+  :bind (("C-." . company-complete))
+  :hook
+  (prog-mode . company-mode))
+
+#+END_SRC
+
 **** Dabbrev and hippie-expand (dynamic word completion)
      :PROPERTIES:
      :CUSTOM_ID: h:57dcf193-0c4e-4ee6-9b2d-6892558b0a84
@@ -813,18 +845,6 @@ this style as the default.  Other options are =string= and =rx=.
 
   :bind (("M-s g" . ag-project)))
 #+end_src
-*** dumb jump
-#+BEGIN_SRC emacs-lisp
-(use-package dumb-jump
-  :bind (("M-g o" . dumb-jump-go-other-window)
-         ("M-g j" . dumb-jump-go)
-         ("M-g b" . dumb-jump-back)
-         ("M-g i" . dumb-jump-go-prompt)
-         ("M-g x" . dumb-jump-go-prefer-external)
-         ("M-g z" . dumb-jump-go-prefer-external-other-window))
-  :config (setq dumb-jump-force-searcher 'ag)
-  :ensure)
-#+END_SRC
 
 * Directory, buffer, window management
   :PROPERTIES:
@@ -928,7 +948,7 @@ this style as the default.  Other options are =string= and =rx=.
            (slot . 0)
            (window-parameters . ((no-other-window . t))))
 	  ;; bottom side window
-          ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\).*"
+          ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\|xref\\).*"
            (display-buffer-in-side-window)
            (window-height . 0.30)
            (side . bottom)
@@ -1038,6 +1058,40 @@ set elsewhere in this document to 72 characters long.
     (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
     :hook (js-mode . flymake-mode))
 #+END_SRC
+*** lsp mode
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :hook (js-mode . lsp)
+    :commands lsp
+    :config
+    (setq lsp-enable-snippet nil
+	  lsp-auto-configure t
+	  lsp-idle-delay 0.500
+	  lsp-auto-guess-root t)
+    (defun lsp-clients-flow-activate-p (file-name _mode)
+      (and (derived-mode-p 'js-mode 'web-mode 'js2-mode 'flow-js2-mode 'rjsx-mode)
+	   (lsp-clients-flow-project-p file-name))))
+
+  ;; lsp-ui for flycheck integration
+  (use-package lsp-ui
+    :ensure t
+    :commands lsp-ui-mode
+    :hook
+    (lsp-mode . lsp-ui-mode))
+
+  ;; company-lsp for company integration
+  (use-package company-lsp
+    :ensure t
+    :commands company-lsp
+    :config
+    (push 'company-lsp company-backends)
+    (setq company-lsp-cache-candidates 'auto
+	  company-lsp-async t
+	  ;; company-lsp-enable-snippet t
+	  company-lsp-enable-recompletion t))
+
+#+END_SRC
 *** JavaScript
 
 #+BEGIN_SRC emacs-lisp
@@ -1054,16 +1108,6 @@ set elsewhere in this document to 72 characters long.
 	      (lambda ()
 		(add-hook 'after-save-hook 'prettier-js-on-buffer nil 'local))))
 
-  (use-package flymake-eslint
-    :ensure t
-    :config
-    (add-hook 'js-mode-hook
-	      (lambda () (flymake-eslint-enable))))
-
-  (use-package flow-minor-mode
-    :ensure t
-    :config
-    (add-hook 'js-mode-hook 'flow-minor-mode))
 #+END_SRC
 *** Python
 
@@ -1692,6 +1736,13 @@ current line is more important than the exact column of the point.
   :hook (package-menu-mode . hl-line-mode))
 #+end_src
 
+*** Exec path from shell
+#+BEGIN_SRC emacs-lisp
+  (use-package exec-path-from-shell
+    :ensure t
+    :config
+    (exec-path-from-shell-initialize))
+#+END_SRC
 * History and state
   :PROPERTIES:
   :CUSTOM_ID: h:1d9437fe-1355-4c2f-8ea7-6668b4d0399b
