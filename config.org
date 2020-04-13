@@ -17,8 +17,6 @@
     ;; 4k considering that the some of the language server responses are in 800k - 3M range.
     (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
-    (setq lsp-prefer-capf t)
-
     ;; The default Ediff behavior is confusing and not desirable. This fixes it.
     (setq ediff-window-setup-function 'ediff-setup-windows-plain
 	  ediff-split-window-function 'split-window-horizontally)
@@ -52,8 +50,8 @@
     (setq custom-safe-themes t)
     (load-theme 'darkula t)
 
-    (setq default-frame-alist '((font . "Inconsolata LGC-13")))
-    (set-frame-font "Inconsolata LGC-13" nil t)
+    (setq default-frame-alist '((font . "Inconsolata LGC-14")))
+    (set-frame-font "Inconsolata LGC-14" nil t)
 
     ;; command as option on mac
     (setq mac-option-key-is-meta nil
@@ -1056,7 +1054,8 @@ set elsewhere in this document to 72 characters long.
     :config
     (define-key flymake-mode-map (kbd "C-c ! l") 'flymake-show-diagnostics-buffer)
     (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
-    :hook (js-mode . flymake-mode))
+    :hook (js-mode . flymake-mode)
+)
 #+END_SRC
 *** lsp mode
 #+BEGIN_SRC emacs-lisp
@@ -1067,18 +1066,20 @@ set elsewhere in this document to 72 characters long.
     :config
     (setq lsp-enable-snippet nil
 	  lsp-auto-configure t
+	  lsp-prefer-capf t
 	  lsp-idle-delay 0.500
 	  lsp-auto-guess-root t)
+
     (defun lsp-clients-flow-activate-p (file-name _mode)
       (and (derived-mode-p 'js-mode 'web-mode 'js2-mode 'flow-js2-mode 'rjsx-mode)
 	   (lsp-clients-flow-project-p file-name))))
 
-  ;; lsp-ui for flycheck integration
-  (use-package lsp-ui
-    :ensure t
-    :commands lsp-ui-mode
-    :hook
-    (lsp-mode . lsp-ui-mode))
+  ;; ;; lsp-ui for flycheck integration
+  ;; (use-package lsp-ui
+  ;;   :ensure t
+  ;;   :commands lsp-ui-mode
+  ;;   :hook
+  ;;   (lsp-mode . lsp-ui-mode))
 
   ;; company-lsp for company integration
   (use-package company-lsp
