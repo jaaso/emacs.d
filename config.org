@@ -48,10 +48,10 @@
     (setq-default truncate-lines t)
 
     (setq custom-safe-themes t)
-    (load-theme 'darkula t)
+    (load-theme 'deeper-blue t)
 
-    (setq default-frame-alist '((font . "Inconsolata LGC-14")))
-    (set-frame-font "Inconsolata LGC-14" nil t)
+    (setq default-frame-alist '((font . "Inconsolata LGC-13")))
+    (set-frame-font "Inconsolata LGC-13" nil t)
 
     ;; command as option on mac
     (setq mac-option-key-is-meta nil
@@ -69,10 +69,6 @@
     (show-paren-mode 1)
 
     (setq ring-bell-function 'ignore)
-
-
-    (global-set-key "\C-x\C-m" 'execute-extended-command)
-    (global-set-key "\C-c\C-m" 'execute-extended-command)
 
     (setq use-file-dialog nil)
     (setq use-dialog-box t)               ; only for mouse events
@@ -892,8 +888,8 @@ this style as the default.  Other options are =string= and =rx=.
     :config
     (defun me/show-project-explorer ()
       "Project dired buffer on the side of the frame.
-  Shows the projectile root folder using dired on the left side of
-  the frame and makes it a dedicated window for that buffer."
+    Shows the projectile root folder using dired on the left side of
+    the frame and makes it a dedicated window for that buffer."
       (interactive)
       (let ((buffer (dired-noselect (cdr (project-current)))))
 	(progn
@@ -901,7 +897,7 @@ this style as the default.  Other options are =string= and =rx=.
 	  (set-window-dedicated-p (get-buffer-window buffer) t))))
 
     :bind (("<f7>" . me/show-project-explorer))
-)
+    )
 
 #+end_src
 
@@ -1043,12 +1039,34 @@ set elsewhere in this document to 72 characters long.
   :CUSTOM_ID: h:b6bd2eea-8269-4029-b446-ee340c12ebc3
   :END:
 
+** custom set faces
+#+BEGIN_SRC emacs-lisp
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(mode-line ((t (:background "gray75" :foreground "black" :box nil))))
+ '(mode-line-buffer-id ((t (:foreground "blue4" :weight normal))))
+ '(mode-line-inactive ((t (:background "gray40" :foreground "black" :box nil)))))
+
+#+END_SRC
+
 ** Language settings for prose and code
    :PROPERTIES:
    :CUSTOM_ID: h:8fc1f9ca-f5ae-407a-b721-aab414ca657b
    :END:
 
-*** flymake
+*** line numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package emacs
+    :hook (prog-mode . display-line-numbers-mode)
+    :config
+    (setq-default display-line-numbers-width 4
+		  display-line-numbers-widen t))
+#+END_SRC
+*** Flymake
 #+BEGIN_SRC emacs-lisp
 (use-package flymake
     :config
@@ -1057,7 +1075,7 @@ set elsewhere in this document to 72 characters long.
     :hook (js-mode . flymake-mode)
 )
 #+END_SRC
-*** lsp mode
+*** Lsp mode
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :ensure t
@@ -1075,11 +1093,15 @@ set elsewhere in this document to 72 characters long.
 	   (lsp-clients-flow-project-p file-name))))
 
   ;; ;; lsp-ui for flycheck integration
-  ;; (use-package lsp-ui
-  ;;   :ensure t
-  ;;   :commands lsp-ui-mode
-  ;;   :hook
-  ;;   (lsp-mode . lsp-ui-mode))
+  (use-package lsp-ui
+     :ensure t
+     :commands lsp-ui-mode
+     :hook
+     (lsp-mode . lsp-ui-mode))
+
+  (use-package lsp-java
+    :ensure t
+    :hook (java-mode . lsp))
 
   ;; company-lsp for company integration
   (use-package company-lsp
@@ -1577,7 +1599,6 @@ The other options in short:
 #+begin_src emacs-lisp
 (use-package mouse
   :config
-  ;; In Emacs 27, use Control + mouse wheel to scale text.
   (setq mouse-wheel-scroll-amount '(1 ((shift) . 1))) ;; one line at a time
   (setq mouse-drag-copy-region t)
   (setq make-pointer-invisible t)
