@@ -7,75 +7,75 @@
   :END:
 ** Sane defaults
 #+begin_src emacs-lisp
-    (use-package emacs
-      :ensure nil
-      :config
-      (cd "~")
+  (use-package emacs
+    :ensure nil
+    :config
+    (cd "~")
 
-      ;; (setq gc-cons-threshold 100000000)
+    ;; (setq gc-cons-threshold 100000000)
 
-      ;; increase the amount of data which Emacs reads from the process. Again the emacs default is too low
-      ;; 4k considering that the some of the language server responses are in 800k - 3M range.
-      (setq read-process-output-max (* 1024 1024)) ;; 1mb
+    ;; increase the amount of data which Emacs reads from the process. Again the emacs default is too low
+    ;; 4k considering that the some of the language server responses are in 800k - 3M range.
+    (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
-      ;; The default Ediff behavior is confusing and not desirable. This fixes it.
-      (setq ediff-window-setup-function 'ediff-setup-windows-plain
+    ;; The default Ediff behavior is confusing and not desirable. This fixes it.
+    (setq ediff-window-setup-function 'ediff-setup-windows-plain
 	  ediff-split-window-function 'split-window-horizontally)
 
-      ;;Let apropos commands perform more extensive searches than default. This also comes from Better Defaults.
-      (setq apropos-do-all t)
+    ;;Let apropos commands perform more extensive searches than default. This also comes from Better Defaults.
+    (setq apropos-do-all t)
 
-      ;; Remove text in active region if inserting text
-      (delete-selection-mode 1)
+    ;; Remove text in active region if inserting text
+    (delete-selection-mode 1)
 
-      ;; Make searches case insensitive.
-      (setq-default case-fold-search t)
+    ;; Make searches case insensitive.
+    (setq-default case-fold-search t)
 
-      (put 'narrow-to-region 'disabled nil)
-      (put 'narrow-to-page 'disabled nil)
-      (put 'upcase-region 'disabled nil)
-      (put 'downcase-region 'disabled nil)
-      (put 'erase-buffer 'disabled nil)
-      (put 'set-goal-column 'disabled nil)
+    (global-hl-line-mode 1)
 
-      ;; Fills up gap in the border when tiling Emacs to half-screen.
-      (setq frame-resize-pixelwise t)
+    (put 'narrow-to-region 'disabled nil)
+    (put 'narrow-to-page 'disabled nil)
+    (put 'upcase-region 'disabled nil)
+    (put 'downcase-region 'disabled nil)
+    (put 'erase-buffer 'disabled nil)
+    (put 'set-goal-column 'disabled nil)
 
-      ;; set additional PATH
-      (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin:~/.nvm/versions/node/v10.16.3/bin:~/.opam/default/bin"))
-      (setq exec-path (append exec-path '("/usr/local/bin" "~/.nvm/versions/node/v10.16.3/bin" "~/.opam/default/bin")))
+    ;; Fills up gap in the border when tiling Emacs to half-screen.
+    (setq frame-resize-pixelwise t)
 
-      ;; Don't break lines for me, please
-      (setq-default truncate-lines t)
+    ;; set additional PATH
+    (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin:~/.nvm/versions/node/v10.16.3/bin"))
+    (setq exec-path (append exec-path '("/usr/local/bin" "~/.nvm/versions/node/v10.16.3/bin")))
 
-      (setq custom-safe-themes t)
-      (load-theme 'material t)
+    ;; Don't break lines for me, please
+    (setq-default truncate-lines t)
 
-      ;; command as option on mac
-      (setq mac-option-key-is-meta nil
-	    mac-command-key-is-meta t
-	    mac-command-modifier 'meta
-	    ns-function-modifier 'hyper
-	    mac-control-modifier 'control
-	    mac-option-modifier 'super)
+    (setq custom-safe-themes t)
+    (load-theme 'darkula t)
 
-      ;; (menu-bar-mode -1)
-      ;; (tool-bar-mode -1)
-      ;; (scroll-bar-mode -1)
+    ;; command as option on mac
+    (setq mac-option-key-is-meta nil
+	  mac-command-key-is-meta t
+	  mac-command-modifier 'meta
+	  ns-function-modifier 'hyper
+	  mac-control-modifier 'control
+	  mac-option-modifier 'super)
 
-      ;; turn on highlight matching brackets when cursor is on one
-      (show-paren-mode 1)
+    ;; (menu-bar-mode -1)
+    ;; (tool-bar-mode -1)
+    ;; (scroll-bar-mode -1)
 
-      (setq ring-bell-function 'ignore)
+    ;; turn on highlight matching brackets when cursor is on one
+    (show-paren-mode 1)
 
-      (setq use-file-dialog nil)
-      (setq use-dialog-box t)               ; only for mouse events
-      (setq inhibit-splash-screen t)
-      (global-unset-key (kbd "C-z"))
-      (global-unset-key (kbd "C-x C-z"))
-      (global-unset-key (kbd "C-h h"))
-  )
+    (setq ring-bell-function 'ignore)
 
+    (setq use-file-dialog nil)
+    (setq use-dialog-box t)               ; only for mouse events
+    (setq inhibit-splash-screen t)
+    (global-unset-key (kbd "C-z"))
+    (global-unset-key (kbd "C-x C-z"))
+    (global-unset-key (kbd "C-h h")))
 #+end_src
 ** Custom.el
    :PROPERTIES:
@@ -96,7 +96,6 @@ your init file.  I prefer to have that stored in a separate file.
 
   (load custom-file))
 #+end_src
-
 
 * Selection candidates and search methods
   :PROPERTIES:
@@ -820,6 +819,24 @@ this style as the default.  Other options are =string= and =rx=.
   :bind (("M-s g" . ag-project)))
 #+end_src
 
+** Expand region
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure t
+    :bind ("C-=" . er/expand-region))
+#+END_SRC
+** Multiple cursors
+#+BEGIN_SRC emacs-lisp
+(use-package multiple-cursors
+  :ensure t
+  :defer t
+  :bind (("C-S-c C-S-c" . mc/edit-lines)
+	 ("C->" . mc/mark-next-like-this)
+	 ("C-<" . mc/mark-previous-like-this)
+	 ("C-S-<mouse-1>" . mc/add-cursor-on-click)
+	 ("C-c o" . mc/mark-all-like-this)))
+#+END_SRC
+
 * Directory, buffer, window management
   :PROPERTIES:
   :CUSTOM_ID: h:402cb0db-1e93-4b1f-8f6d-e17b4409fb86
@@ -905,7 +922,7 @@ this style as the default.  Other options are =string= and =rx=.
            (slot . 0)
            (window-parameters . ((no-other-window . t))))
 	  ;; bottom side window
-          ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\|xref\\).*"
+          ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\|xref\\|copy history\\).*"
            (display-buffer-in-side-window)
            (window-height . 0.30)
            (side . bottom)
@@ -1133,7 +1150,7 @@ Summary of what these do:
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :ensure t
-    :hook (js-mode . lsp)
+    :hook ((js-mode . lsp))
     :commands lsp
     :config
     (setq lsp-prefer-capf t
@@ -1239,7 +1256,7 @@ Summary of what these do:
 		(flymake-eslint-enable))))
 #+END_SRC
 
-*** jest
+**** jest
 #+BEGIN_SRC emacs-lisp
 (use-package jest
   :ensure t
@@ -1250,7 +1267,7 @@ Summary of what these do:
     '(define-key js-mode-map (kbd "C-c t t") 'jest-file)))
 #+END_SRC
 
-*** Prettier
+**** Prettier
 
 #+BEGIN_SRC emacs-lisp
   (use-package add-node-modules-path
@@ -1260,6 +1277,16 @@ Summary of what these do:
   (use-package prettier-js
     :ensure t
     :hook (js-mode . prettier-js-mode))
+
+#+END_SRC
+
+
+*** Scala
+#+BEGIN_SRC emacs-lisp
+
+(use-package scala-mode
+  :mode "\\.s\\(cala\\|bt\\)$")
+
 
 #+END_SRC
 
@@ -1324,34 +1351,6 @@ Summary of what these do:
   (setq cider-show-error-buffer nil))
 
 #+END_SRC
-*** Ocaml
-#+BEGIN_SRC emacs-lisp
-  (use-package tuareg
-    :ensure t
-    :defer t
-    :config
-    (add-hook 'tuareg-mode-hook #'electric-pair-local-mode)
-    ;; (add-hook 'tuareg-mode-hook 'tuareg-imenu-set-imenu)
-    (setq auto-mode-alist
-          (append '(("\\.ml[ily]?$" . tuareg-mode)
-                    ("\\.topml$" . tuareg-mode))
-                  auto-mode-alist)))
-
-  (use-package merlin
-    :ensure t
-    :defer t
-    :config
-    (add-hook 'tuareg-mode-hook 'merlin-mode)
-    (setq merlin-error-after-save nil))
-
-  (use-package utop
-    :ensure t
-    :defer t
-    :config
-    (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
-    (add-hook 'tuareg-mode-hook 'utop-minor-mode)
-    )
-#+END_SRC
 
 ** Custom movements and motions
    :PROPERTIES:
@@ -1366,6 +1365,17 @@ Summary of what these do:
 #+begin_src emacs-lisp
   (use-package emacs
     :config
+    (defun me/show-kill-ring ()
+      "Insert all `kill-ring' content in a new buffer named *copy history*."
+      (interactive)
+      (let (($buf (generate-new-buffer "*copy history*")))
+	(progn
+	  (switch-to-buffer $buf)
+	  (funcall 'fundamental-mode)
+	  (dolist (x kill-ring )
+	    (insert x "\n\n================================================================================\n\n"))
+	  (goto-char (point-min)))))
+
     (defun shell-command-on-buffer (command)
       "run a command on the current file and revert the buffer"
       (interactive "sCommand:")
