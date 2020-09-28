@@ -19,7 +19,7 @@
 ;; Set default font
 (set-face-attribute 'default nil
                     :family "Inconsolata LGC"
-                    :height 140
+                    :height 130
                     :weight 'normal
                     :width 'normal)
 

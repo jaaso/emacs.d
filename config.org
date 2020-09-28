@@ -12,8 +12,6 @@
     :config
     (cd "~")
 
-    ;; (setq gc-cons-threshold 100000000)
-
     ;; increase the amount of data which Emacs reads from the process. Again the emacs default is too low
     ;; 4k considering that the some of the language server responses are in 800k - 3M range.
     (setq read-process-output-max (* 1024 1024)) ;; 1mb
@@ -31,7 +29,7 @@
     ;; Make searches case insensitive.
     (setq-default case-fold-search t)
 
-    (global-hl-line-mode 1)
+    (global-hl-line-mode -1)
 
     (put 'narrow-to-region 'disabled nil)
     (put 'narrow-to-page 'disabled nil)
@@ -51,7 +49,7 @@
     (setq-default truncate-lines t)
 
     (setq custom-safe-themes t)
-    (load-theme 'darkula t)
+    (load-theme 'professional t)
 
     ;; command as option on mac
     (setq mac-option-key-is-meta nil
@@ -1159,7 +1157,7 @@ Summary of what these do:
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :ensure t
-    :hook ((js-mode . lsp) (scala-mode . lsp))
+    :hook ((js-mode . lsp) (scala-mode . lsp) (java-mode . lsp))
     :commands lsp
     :config
     (setq lsp-prefer-capf t
