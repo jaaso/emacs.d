@@ -1159,7 +1159,7 @@ Summary of what these do:
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :ensure t
-    :hook ((js-mode . lsp) (scala-mode . lsp))
+    :hook ((js-mode . lsp))
     :commands lsp
     :config
     (setq lsp-prefer-capf t
@@ -1226,7 +1226,7 @@ Summary of what these do:
       ;; using a Hi-DPI display, uncomment this to double the icon size.
       (treemacs-resize-icons 19)
 
-      (treemacs-follow-mode t)
+      (treemacs-follow-mode -1)
       (treemacs-filewatch-mode t)
       (treemacs-fringe-indicator-mode t)
       (pcase (cons (not (null (executable-find "git")))
@@ -1289,36 +1289,6 @@ Summary of what these do:
 
 #+END_SRC
 
-
-*** Scala
-#+BEGIN_SRC emacs-lisp
-
-(use-package scala-mode
-  :ensure t
-   :interpreter
-    ("scala" . scala-mode)
-  :mode "\\.s\\(cala\\|bt\\)$")
-
-(use-package sbt-mode
-  :ensure t
-  :commands sbt-start sbt-command
-  :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map)
-   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-   (setq sbt:program-options '("-Dsbt.supershell=false"))
-)
-
-(use-package lsp-metals
-  :ensure t
-  :config (setq lsp-metals-treeview-show-when-views-received t))
-
-
-#+END_SRC
 
 *** Python
 
