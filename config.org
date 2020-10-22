@@ -1155,7 +1155,7 @@ Summary of what these do:
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :ensure t
-    :hook ((js-mode . lsp) (scala-mode . lsp) (java-mode . lsp))
+    :hook ((js-mode . lsp) (java-mode . lsp))
     :commands lsp
     :config
     (setq lsp-prefer-capf t
@@ -1222,7 +1222,7 @@ Summary of what these do:
       ;; using a Hi-DPI display, uncomment this to double the icon size.
       (treemacs-resize-icons 19)
 
-      (treemacs-follow-mode t)
+      (treemacs-follow-mode -1)
       (treemacs-filewatch-mode t)
       (treemacs-fringe-indicator-mode t)
       (pcase (cons (not (null (executable-find "git")))
