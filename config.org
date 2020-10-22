@@ -49,7 +49,7 @@
     (setq-default truncate-lines t)
 
     (setq custom-safe-themes t)
-    (load-theme 'professional t)
+    (load-theme 'material t)
 
     ;; command as option on mac
     (setq mac-option-key-is-meta nil
@@ -462,9 +462,7 @@ inside a given location."
        (completing-read "Find project: " projects nil t))))
 
   :bind (("M-s p" . me/find-project)
-         ("M-s f" . project-find-file)
          ("M-s z" . me/find-file-from-dir-recursive)
-         ("M-s r" . project-find-regexp)
          ("M-s C-M-%" . project-query-replace-regexp)))
 #+end_src
 
@@ -729,8 +727,8 @@ effectively supersede the functionality of =anzu=, a package I once used.
   (setq isearch-lazy-highlight t)
   ;; All of the following variables were introduced in Emacs 27.1.
   (setq isearch-lazy-count t)
-  (setq lazy-count-prefix-format "(%s/%s) ")
-  (setq lazy-count-suffix-format nil)
+  (setq lazy-count-prefix-format nil)
+  (setq lazy-count-suffix-format " (%s/%s)")
   (setq isearch-yank-on-move 'shift)
   (setq isearch-allow-scroll 'unlimited)
 
@@ -1287,36 +1285,6 @@ Summary of what these do:
 
 #+END_SRC
 
-
-*** Scala
-#+BEGIN_SRC emacs-lisp
-
-(use-package scala-mode
-  :ensure t
-   :interpreter
-    ("scala" . scala-mode)
-  :mode "\\.s\\(cala\\|bt\\)$")
-
-(use-package sbt-mode
-  :ensure t
-  :commands sbt-start sbt-command
-  :config
-  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
-  ;; allows using SPACE when in the minibuffer
-  (substitute-key-definition
-   'minibuffer-complete-word
-   'self-insert-command
-   minibuffer-local-completion-map)
-   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
-   (setq sbt:program-options '("-Dsbt.supershell=false"))
-)
-
-(use-package lsp-metals
-  :ensure t
-  :config (setq lsp-metals-treeview-show-when-views-received t))
-
-
-#+END_SRC
 
 *** Python
 
