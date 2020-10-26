@@ -49,7 +49,7 @@
     (setq-default truncate-lines t)
 
     (setq custom-safe-themes t)
-    (load-theme 'professional t)
+    (load-theme 'material t)
 
     ;; command as option on mac
     (setq mac-option-key-is-meta nil
@@ -58,10 +58,6 @@
 	  ns-function-modifier 'hyper
 	  mac-control-modifier 'control
 	  mac-option-modifier 'super)
-
-    ;; (menu-bar-mode -1)
-    ;; (tool-bar-mode -1)
-    ;; (scroll-bar-mode -1)
 
     ;; turn on highlight matching brackets when cursor is on one
     (show-paren-mode 1)
@@ -408,66 +404,6 @@ current buffer and switch focus back to the minibuffer."
 
 #+end_src
 
-*** Completion for projects and directory trees
-    :PROPERTIES:
-    :CUSTOM_ID: h:7862f39e-aed0-4d02-9f1e-60c4601a9734
-    :END:
-
-These are a set of commands for interacting with version-controlled
-directories, aka "projects", or directory trees in general.  With these
-I have no need for the third-party "Projectile" package.
-
-Some of the functions furnished herein are built into Emacs, while
-others are defined by me to satisfy my particular needs.
-
-Everything I have here presupposes a completion framework, so make sure
-to check the previous section on [[#h:07e173ea-e7ed-4fc0-ba3c-e44b403359a7][Minibuffer essentials and Icomplete]].
-
-Concerning the design of these key bindings, they are consistent with
-all "advanced search methods" (e.g. the default =M-s o= for =occur=).
-
-Note that =project-find-regexp= produces an =xref= buffer from where one can
-run a =query-replace= on the results by hitting =r=.  If the intention is to
-make complex changes, consider =project-query-replace-regexp= instead.
-There also are other techniques which are project-agnostic, such as
-=multi-occur=, =ibuffer-do-occur=, =dired-do-find-regexp-and-replace=.  Read
-their respective docs (with =C-h f FUNCTION=).
-
-Also see my [[*ripgrep (rg.el)][configurations for ripgrep]].
-
-#+begin_src emacs-lisp
-(use-package project
-  :config
-
-  (defun me/find-file-from-dir-recursive ()
-    "NEEDS REVIEW: Find file recursively, starting from present dir."
-    (interactive)
-    (let* ((file-list (directory-files-recursively default-directory "" nil))
-           (files (mapcar 'abbreviate-file-name file-list)))
-      (find-file
-       (completing-read "Find file recursively: " files nil t))))
-
-  (defun me/find-project ()
-    "Switch to sub-directory at ~/code.
-
-Allows you to switch directly to the root directory of a project
-inside a given location."
-    (interactive)
-    (let* ((path "~/code")
-           (dotless directory-files-no-dot-files-regexp)
-           (project-list (project-combine-directories
-                          (directory-files path t dotless)))
-           (projects (mapcar 'abbreviate-file-name project-list)))
-      (dired
-       (completing-read "Find project: " projects nil t))))
-
-  :bind (("M-s p" . me/find-project)
-         ("M-s f" . project-find-file)
-         ("M-s z" . me/find-file-from-dir-recursive)
-         ("M-s r" . project-find-regexp)
-         ("M-s C-M-%" . project-query-replace-regexp)))
-#+end_src
-
 *** In-buffer completions
     :PROPERTIES:
     :CUSTOM_ID: h:98876022-57cc-40de-936e-4ee42cefd69a
@@ -475,30 +411,28 @@ inside a given location."
 
 **** Company mode
 #+BEGIN_SRC emacs-lisp
-(use-package company
-  :ensure t
-  :config
-  (setq company-tooltip-align-annotations t)
-  ;; Reduce the number of characters before company kicks in
-  (setq company-minimum-prefix-length 1)
-  ;; Disable automatic popup for completion
-  ;; (setq company-idle-delay nil)
+  (use-package company
+    :ensure t
+    :config
+    (setq company-tooltip-align-annotations t)
+    ;; Reduce the number of characters before company kicks in
+    (setq company-minimum-prefix-length 1)
+    ;; Disable automatic popup for completion
 
-  ;; Reconfigure company to not use M-p and M-n for autocomplete navigation
-  (with-eval-after-load 'company
-    (define-key company-active-map (kbd "C-n") 'company-select-next)
-    (define-key company-active-map (kbd "C-p") 'company-select-previous)
-    (define-key company-search-map (kbd "C-n") 'company-select-next)
-    (define-key company-search-map (kbd "C-p") 'company-select-previous)
-    (define-key company-search-map (kbd "C-t") 'company-search-toggle-filtering))
+    (setq company-idle-delay 0)
 
-  ;; Set Control-. as autocomplete shortcut
-  :bind (("C-." . company-complete))
-  :hook
-  (prog-mode . company-mode))
+    ;; Reconfigure company to not use M-p and M-n for autocomplete navigation
+    (with-eval-after-load 'company
+      (define-key company-active-map (kbd "C-n") 'company-select-next)
+      (define-key company-active-map (kbd "C-p") 'company-select-previous)
+      (define-key company-search-map (kbd "C-n") 'company-select-next)
+      (define-key company-search-map (kbd "C-p") 'company-select-previous)
+      (define-key company-search-map (kbd "C-t") 'company-search-toggle-filtering))
 
-(use-package company-lsp
-  :ensure t)
+    ;; Set Control-. as autocomplete shortcut
+    :bind (("C-." . company-complete))
+    :hook
+    (prog-mode . company-mode))
 
 #+END_SRC
 
@@ -780,29 +714,6 @@ afterwards exit the search altogether."
          ("<C-return>" . me/isearch-other-end)))
 #+end_src
 
-*** Regular expressions: re-builder and visual-regexp
-    :PROPERTIES:
-    :CUSTOM_ID: h:6c6759c8-3ae3-40b0-8356-05cc0975e12a
-    :END:
-
-To learn more about regular expressions, read the relevant pages in
-the official manual.  Assuming you have this installed properly on
-your system, run =C-h r i regexp= to get to the starting chapter.
-
-Also watch my ~35 minute-long [[https://protesilaos.com/codelog/2020-01-23-emacs-regexp-primer/][primer on Emacs regexp]] (2020-01-23).
-
-Emacs offers a built-in package for practising regular expressions.
-By default, =re-builder= uses Emacs-style escape notation, in the form
-of double backslashes.  You can switch between the various styles by
-using =C-c TAB= inside of the regexp builder's buffer.  I choose to keep
-this style as the default.  Other options are =string= and =rx=.
-
-#+begin_src emacs-lisp
-(use-package re-builder
-  :config
-  (setq reb-re-syntax 'read))
-#+end_src
-
 *** Ag
     :PROPERTIES:
     :CUSTOM_ID: h:31622bf2-526b-4426-9fda-c0fc59ac8f4b
@@ -820,30 +731,6 @@ this style as the default.  Other options are =string= and =rx=.
   :bind (("M-s g" . ag-project)))
 #+end_src
 
-** Expand region
-#+BEGIN_SRC emacs-lisp
-  (use-package expand-region
-    :ensure t
-    :bind ("C-=" . er/expand-region))
-#+END_SRC
-** Multiple cursors
-#+BEGIN_SRC emacs-lisp
-(use-package multiple-cursors
-  :ensure t
-  :defer t
-  :bind (("C-S-c C-S-c" . mc/edit-lines)
-	 ("C->" . mc/mark-next-like-this)
-	 ("C-<" . mc/mark-previous-like-this)
-	 ("C-S-<mouse-1>" . mc/add-cursor-on-click)
-	 ("C-c o" . mc/mark-all-like-this)))
-#+END_SRC
-** undo tree
-#+BEGIN_SRC emacs-lisp
-  (use-package undo-tree
-    :ensure t
-    :init
-    (global-undo-tree-mode))
-#+END_SRC
 * Directory, buffer, window management
   :PROPERTIES:
   :CUSTOM_ID: h:402cb0db-1e93-4b1f-8f6d-e17b4409fb86
@@ -1041,26 +928,6 @@ set elsewhere in this document to 72 characters long.
     (setq-default display-line-numbers-width 4
 		  display-line-numbers-widen t))
 #+END_SRC
-*** EditorConfig
-#+BEGIN_SRC emacs-lisp
-(use-package editorconfig
-  :ensure t
-  :config
-  (editorconfig-mode 1))
-#+END_SRC
-*** Recognise subwords
-
-It is better you do C-h f subword-mode.  Basically, this alters the
-way Emacs understands word boundaries.  So, camelCaseWords are
-exposed as their constituents rather than one long word, meaning that
-motions will behave accordingly.
-
-#+BEGIN_SRC emacs-lisp
-(use-package subword
-  :defer t
-  :init (add-hook 'prog-mode-hook 'subword-mode))
-#+END_SRC
-
 *** Configure 'electric' behaviour
 Emacs labels as “electric” any behaviour that involves contextual
   auto-insertion of characters.  This is a summary of my settings:
@@ -1115,8 +982,8 @@ Emacs labels as “electric” any behaviour that involves contextual
   (setq electric-quote-replace-double t)
   :hook (after-init-hook . (lambda ()
                              (electric-indent-mode 1)
-                             (electric-pair-mode -1)
-                             (electric-quote-mode -1))))
+                             (electric-pair-mode 1)
+                             (electric-quote-mode 1))))
 #+END_SRC
 
 *** Parentheses
@@ -1157,11 +1024,13 @@ Summary of what these do:
 #+BEGIN_SRC emacs-lisp
   (use-package lsp-mode
     :ensure t
-    :hook ((js-mode . lsp) (java-mode . lsp))
+    :hook ((js-mode . lsp)
+	   (java-mode . lsp)
+	   (python-mode . lsp))
     :commands lsp
     :config
     (setq lsp-prefer-capf t
-	  lsp-idle-delay 0
+	  lsp-idle-delay 0.500
 	  lsp-enable-snippet nil
 	  lsp-auto-guess-root nil))
 
@@ -1247,6 +1116,32 @@ Summary of what these do:
     :ensure t
     :config (treemacs-icons-dired-mode))
 #+END_SRC
+*** html
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; TODO Move this to other location in file
+  (use-package emacs
+    :config
+    (defun tag-word-or-region (tag)
+      "Surround current word or region with a given tag."
+      (interactive "sEnter tag (without <>): ")
+      (let (pos1 pos2 bds start-tag end-tag)
+	(setq start-tag (concat "<" tag ">"))
+	(setq end-tag (concat "</" tag ">"))
+	(if (and transient-mark-mode mark-active)
+	    (progn
+	      (goto-char (region-end))
+	      (insert end-tag)
+	      (goto-char (region-beginning))
+	      (insert start-tag))
+	  (progn
+	    (setq bds (bounds-of-thing-at-point 'symbol))
+	    (goto-char (cdr bds))
+	    (insert end-tag)
+	    (goto-char (car bds))
+	    (insert start-tag))))))
+#+END_SRC
 *** JavaScript
 #+BEGIN_SRC emacs-lisp
   (use-package js
@@ -1287,31 +1182,12 @@ Summary of what these do:
 
 #+END_SRC
 
-
 *** Python
 
 #+BEGIN_SRC emacs-lisp
-(use-package elpy
-  :ensure t
-  :defer t
-  :init
-  (add-to-list 'auto-mode-alist '("\\.py$" . python-mode))
-  :bind (:map elpy-mode-map
-		("<M-left>" . nil)
-		("<M-right>" . nil)
-		("<M-S-left>" . elpy-nav-indent-shift-left)
-		("<M-S-right>" . elpy-nav-indent-shift-right)
-		("M-." . elpy-goto-definition)
-		("M-," . pop-tag-mark))
-  :config
-  (setq elpy-rpc-backend "jedi"))
-
 (use-package python
   :ensure nil
-  :hook (python-mode . turn-on-prettify-symbols-mode)
-  :config
-  (elpy-enable)
-  )
+  :hook (python-mode . turn-on-prettify-symbols-mode))
 
 #+END_SRC
 *** Clojure
@@ -1643,9 +1519,13 @@ Summary of what these do:
 
 *** Global keys definitions
 #+BEGIN_SRC emacs-lisp
-(use-package emacs
-  :config
-  (define-key global-map (kbd "RET") 'newline-and-indent))
+  (use-package emacs
+    :config
+    (define-key global-map (kbd "RET") 'newline-and-indent)
+
+    (global-set-key "\C-cy" '(lambda ()
+			       (interactive)
+			       (popup-menu 'yank-menu))))
 #+END_SRC
 ** Cursor and mouse settings
    :PROPERTIES:
