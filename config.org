@@ -49,7 +49,7 @@
     (setq-default truncate-lines t)
 
     (setq custom-safe-themes t)
-    (load-theme 'material t)
+    (load-theme 'darkula t)
 
     ;; command as option on mac
     (setq mac-option-key-is-meta nil
