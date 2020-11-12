@@ -982,8 +982,8 @@ Emacs labels as “electric” any behaviour that involves contextual
   (setq electric-quote-replace-double t)
   :hook (after-init-hook . (lambda ()
                              (electric-indent-mode 1)
-                             (electric-pair-mode 1)
-                             (electric-quote-mode 1))))
+                             (electric-pair-mode -1)
+                             (electric-quote-mode -1))))
 #+END_SRC
 
 *** Parentheses
@@ -1030,6 +1030,7 @@ Summary of what these do:
     :commands lsp
     :config
     (setq lsp-prefer-capf t
+          lsp-pyls-plugins-flake8-enabled t
 	  lsp-idle-delay 0.500
 	  lsp-enable-snippet nil
 	  lsp-auto-guess-root nil))
@@ -1158,16 +1159,6 @@ Summary of what these do:
 		(flymake-eslint-enable))))
 #+END_SRC
 
-**** jest
-#+BEGIN_SRC emacs-lisp
-(use-package jest
-  :ensure t
-  :config
-  (setq jest-executable "npm run test --coverage=false --verbose=false")
-  (setq jest-pdb-track nil)
-  (eval-after-load 'js
-    '(define-key js-mode-map (kbd "C-c t t") 'jest-file)))
-#+END_SRC
 
 **** Prettier
 
@@ -1482,25 +1473,6 @@ Summary of what these do:
 #+BEGIN_SRC emacs-lisp
 (use-package emacs
   :config
-  (global-set-key (kbd "C-S-n")
-                  (lambda ()
-                    (interactive)
-                    (ignore-errors (next-line 5))))
-
-  (global-set-key (kbd "C-S-p")
-                  (lambda ()
-                    (interactive)
-                    (ignore-errors (previous-line 5))))
-
-  (global-set-key (kbd "C-S-f")
-                  (lambda ()
-                    (interactive)
-                    (ignore-errors (forward-char 5))))
-
-  (global-set-key (kbd "C-S-b")
-                  (lambda ()
-                    (interactive)
-                    (ignore-errors (backward-char 5))))
 
   (defun move-line-up ()
     (interactive)
@@ -1520,7 +1492,7 @@ Summary of what these do:
 *** Global keys definitions
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
-    :config
+  :config
     (define-key global-map (kbd "RET") 'newline-and-indent)
 
     (global-set-key "\C-cy" '(lambda ()
