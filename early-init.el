@@ -18,7 +18,7 @@
 ;; Set default font
 (set-face-attribute 'default nil
                     :family "Inconsolata LGC"
-                    :height 140
+                    :height (if (eq system-type 'gnu/linux) 130 140)
                     :weight 'normal
                     :width 'normal)
 
