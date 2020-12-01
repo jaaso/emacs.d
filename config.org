@@ -5,6 +5,10 @@
   :PROPERTIES:
   :CUSTOM_ID: h:4d42f3e3-e96f-4125-a819-0544a21d45f3
   :END:
+
+This section contains the relatively few configurations that are needed
+prior to the setup of everything else.
+
 ** Sane defaults
 #+begin_src emacs-lisp
   (use-package emacs
@@ -16,34 +20,18 @@
     ;; 4k considering that the some of the language server responses are in 800k - 3M range.
     (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
-    ;; The default Ediff behavior is confusing and not desirable. This fixes it.
-    (setq ediff-window-setup-function 'ediff-setup-windows-plain
-	  ediff-split-window-function 'split-window-horizontally)
-
     ;;Let apropos commands perform more extensive searches than default. This also comes from Better Defaults.
     (setq apropos-do-all t)
 
-    ;; Remove text in active region if inserting text
-    (delete-selection-mode 1)
-
     ;; Make searches case insensitive.
     (setq-default case-fold-search t)
-
-    (global-hl-line-mode -1)
-
-    (put 'narrow-to-region 'disabled nil)
-    (put 'narrow-to-page 'disabled nil)
-    (put 'upcase-region 'disabled nil)
-    (put 'downcase-region 'disabled nil)
-    (put 'erase-buffer 'disabled nil)
-    (put 'set-goal-column 'disabled nil)
 
     ;; Fills up gap in the border when tiling Emacs to half-screen.
     (setq frame-resize-pixelwise t)
 
     ;; set additional PATH
-    (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin:~/.nvm/versions/node/v10.16.3/bin"))
-    (setq exec-path (append exec-path '("/usr/local/bin" "~/.nvm/versions/node/v10.16.3/bin")))
+    (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+    (setq exec-path (append exec-path '("/usr/local/bin")))
 
     ;; Don't break lines for me, please
     (setq-default truncate-lines t)
@@ -53,20 +41,12 @@
 
     ;; command as option on mac
     (setq mac-option-key-is-meta nil
-	  mac-command-key-is-meta t
-	  mac-command-modifier 'meta
-	  ns-function-modifier 'hyper
-	  mac-control-modifier 'control
-	  mac-option-modifier 'super)
+          mac-command-key-is-meta t
+          mac-command-modifier 'meta
+          ns-function-modifier 'hyper
+          mac-control-modifier 'control
+          mac-option-modifier 'super)
 
-    ;; turn on highlight matching brackets when cursor is on one
-    (show-paren-mode 1)
-
-    (setq ring-bell-function 'ignore)
-
-    (setq use-file-dialog nil)
-    (setq use-dialog-box t)               ; only for mouse events
-    (setq inhibit-splash-screen t)
     (global-unset-key (kbd "C-z"))
     (global-unset-key (kbd "C-x C-z"))
     (global-unset-key (kbd "C-h h")))
@@ -524,16 +504,16 @@ position of the cursor after the skeleton has been inserted.
 
     (define-abbrev-table 'global-abbrev-table
       '(
-	;; net abbrev
-	("afaik" "as far as i know" )
-	("atm" "at the moment" )
-	("dfb" "difference between" )
-	("ty" "thank you" )
-	("ui" "user interface" )
-	("uns" "understand" )
-	("ur" "you are" )
-	("btw" "by the way" )
-	))
+        ;; net abbrev
+        ("afaik" "as far as i know" )
+        ("atm" "at the moment" )
+        ("dfb" "difference between" )
+        ("ty" "thank you" )
+        ("ui" "user interface" )
+        ("uns" "understand" )
+        ("ur" "you are" )
+        ("btw" "by the way" )
+        ))
 
     ;; define abbrev for specific major mode
     ;; the first part of the name should be the value of the variable major-mode of that mode
@@ -543,10 +523,8 @@ position of the cursor after the skeleton has been inserted.
       (clear-abbrev-table js-mode-abbrev-table))
 
     (define-abbrev-table 'js-mode-abbrev-table
-      '(
-          ("clg" "console.log();" c-electric-continued-statement 0)
-	  ("dbg" "debugger;" c-electric-continued-statement 0)
-	))
+      '(("clg" "console.log();" c-electric-continued-statement 0)
+        ("dbg" "debugger;" c-electric-continued-statement 0)))
 
     (set-default 'abbrev-mode nil)
 
@@ -561,10 +539,10 @@ position of the cursor after the skeleton has been inserted.
 These are meant to enhance the functionality of tools that are already
 shipped with Emacs.
 
-*** Isearch enhancements
-   :PROPERTIES:
-   :CUSTOM_ID: h:b67687ee-25a3-4bf4-a924-180ccb63c629
-   :END:
+*** Isearch configurations and enhancements
+:PROPERTIES:
+:CUSTOM_ID: h:b67687ee-25a3-4bf4-a924-180ccb63c629
+:END:
 
 The built-in search mechanism is a thing of beauty: minimal in its
 presentation, powerful in its applications.
@@ -594,7 +572,7 @@ buffer with the contents of the search terms.  Absolutely great!
 
 With regard to the replace commands, note that you can use them on the
 active region.  Furthermore, you do not need to confirm each action, but
-can instead type =!= to answer "yes" to all possible replacement.  Better
+can instead type =!= to answer "yes" to all possible replacements.  Better
 only use this while having already limited the results to the active
 region, to some specialised editable buffer like the one of =occur=, or by
 using Emacs' narrowing techniques, such as =narrow-to-region=.
@@ -603,10 +581,10 @@ In the package declaration below, the combined effect of the variables
 for whitespace is a valuable hack: typing a space is the same as
 inserting a wildcard, which is much more useful as far as I am
 concerned.  A single space represents a wildcard that matches items in a
-non-greedy fashion.  *This concerns regular searches* (the standard =C-s=
-and =C-r=).  The regexp functions =C-M-s= and =C-M-r= remain in tact.  You can
-always toggle whitespace matching behaviour while performing a search,
-with =M-s SPC= (revert back to just literal spaces).
+non-greedy fashion.  *This affects regular searches* (the standard =C-s= and
+=C-r=).  The regexp-sensitive functions =C-M-s= and =C-M-r= remain in tact.
+You can always toggle whitespace matching behaviour while performing a
+search, with =M-s SPC= (revert back to just literal spaces).
 
 Now on to some custom functions, all of which are derived from the
 source code of =isearch= (do it with =M-x find-library RET isearch RET=).
@@ -648,13 +626,17 @@ Here is an overview of what goes into this package declaration.
   and super effective (*pro tip*: hit =!= to answer "yes" to all possible
   matches, which is possible in all cases where Emacs asks you for
   multiple confirmations).
++ Move to occurrence at start or end :: Using the symbol at point, move
+  to the first or optionally the ARGth occurrence from the beginning or
+  the end of the buffer.  I map these commands to the same keys they are
+  bound to in =isearch-mode-map=, namely, =M-s M-<= and =M-s M->=.
 
 The variables about the lazy count that are commented as "Emacs 27.1"
 effectively supersede the functionality of =anzu=, a package I once used.
 
 #+begin_src emacs-lisp
 (use-package isearch
-  :delight
+  :diminish
   :config
   (setq search-highlight t)
   (setq search-whitespace-regexp ".*?")
@@ -684,17 +666,21 @@ confines of word boundaries (e.g. multiple words)."
     (when isearch-other-end
       (goto-char isearch-other-end)))
 
-  (defun me/isearch-abort ()
-    "Remove non-matching `isearch' input, reverting to previous
-successful search and continuing with the search.
+  (defun me/isearch-abort-dwim ()
+    "Delete failed `isearch' input, single char, or cancel search.
 
-This is a modified variant of the original `isearch-abort',
-mapped to C-g which will remove the failed match if any and only
-afterwards exit the search altogether."
+This is a modified variant of `isearch-abort' that allows us to
+perform the following, based on the specifics of the case: (i)
+delete the entirety of a non-matching part, when present; (ii)
+delete a single character, when possible; (iii) exit current
+search if no character is present and go back to point where the
+search started."
     (interactive)
-    (discard-input)
-    (while (or (not isearch-success) isearch-error)
-      (isearch-pop-state))
+    (if (eq (length isearch-string) 0)
+        (isearch-cancel)
+      (isearch-del-char)
+      (while (or (not isearch-success) isearch-error)
+        (isearch-pop-state)))
     (isearch-update))
 
   (defun me/isearch-query-replace-symbol-at-point ()
@@ -703,32 +689,745 @@ afterwards exit the search altogether."
     (isearch-forward-symbol-at-point)
     (isearch-query-replace-regexp))
 
-  :bind (("M-s M-o" . multi-occur)
-         ("M-s %" . me/isearch-query-replace-symbol-at-point)
+  (defmacro me/isearch-occurrence (name edge &optional doc)
+    "Construct function for moving to `isearch' occurrence.
+NAME is the name of the function.  EDGE is either the beginning
+or the end of the buffer.  Optional DOC is the resulting
+function's docstring."
+    `(defun ,name (&optional arg)
+       ,doc
+       (interactive "p")
+       (let ((x (or arg 1))
+             (command (intern (format "isearch-%s-of-buffer" ,edge))))
+         (isearch-forward-symbol-at-point)
+         (funcall command x))))
+
+  (me/isearch-occurrence
+   me/isearch-beginning-of-buffer
+   "beginning"
+   "Run `isearch-beginning-of-buffer' for the symbol at point.
+With numeric ARG, move to ARGth occurrence counting from the
+beginning of the buffer.")
+
+  (me/isearch-occurrence
+   me/isearch-end-of-buffer
+   "end"
+   "Run `isearch-end-of-buffer' for the symbol at point.
+With numeric ARG, move to ARGth occurrence counting from the
+end of the buffer.")
+
+  :bind (("M-s %" . me/isearch-query-replace-symbol-at-point)
+         ("M-s M-<" . me/isearch-beginning-of-buffer)
+         ("M-s M->" . me/isearch-end-of-buffer)
          :map minibuffer-local-isearch-map
          ("M-/" . isearch-complete-edit)
          :map isearch-mode-map
+         ("C-g" . isearch-cancel)       ; instead of `isearch-abort'
          ("M-/" . isearch-complete)
          ("C-SPC" . me/isearch-mark-and-exit)
-         ("DEL" . me/isearch-abort)
+         ("<backspace>" . me/isearch-abort-dwim)
          ("<C-return>" . me/isearch-other-end)))
 #+end_src
 
-*** Ag
-    :PROPERTIES:
-    :CUSTOM_ID: h:31622bf2-526b-4426-9fda-c0fc59ac8f4b
-    :END:
+*** Occur (replace.el)
+:PROPERTIES:
+:CUSTOM_ID: h:037b7121-1238-42f8-a771-0dce43a46d23
+:END:
+
+The =setq= forms are mere stylistic tweaks for the buffer that =M-x occur=
+produces.  The faces are part of my Modus themes (see [[#h:b7444e76-75d4-4ae6-a9d6-96ff9408efe6][relevant section]]).
+
+The functions are simple tools to either produce a list with all URLs
+present in the buffer (=me/occur-url=), or prompt you for visiting a URL
+from those available using completion methods.
 
 #+begin_src emacs-lisp
-(use-package ag
-  :ensure t
+(use-package replace
   :config
+  (setq list-matching-lines-jump-to-current-line t)
+  ;; See my "Modus themes" for these inherited faces
+  (setq list-matching-lines-buffer-name-face
+        '(:inherit modus-theme-intense-neutral :weight bold))
+  (setq list-matching-lines-current-line-face
+        '(:inherit modus-theme-special-mild))
 
-  (setq ag-reuse-buffers nil)
-  (setq ag-reuse-window t)
-  (setq ag-highlight-search t)
+  (defun me/occur-url ()
+    "Produce list with all URLs in the current buffer."
+    (interactive)
+    (let ((urls browse-url-button-regexp))
+      (occur urls "\\&")))
 
-  :bind (("M-s g" . ag-project)))
+  (defun me/occur-browse-url-in-buffer ()
+    "Run `eww' on a URL from the buffer using completion.
+Also see `me/occur-url'."
+    (interactive)
+    (let ((matches nil))
+      (save-excursion
+        (goto-char (point-min))
+        (while (search-forward-regexp browse-url-button-regexp nil t)
+          (push (match-string-no-properties 0) matches)))
+      (eww
+       (completing-read "Browse URL: " matches nil t))))
+
+  (defun me/occur-visit-or-list-urls (&optional arg)
+    "Wrap `me/occur-visit-or-list-urls' and `me/occur-url'.
+Meant to economise on key bindings."
+    (interactive "P")
+    (if arg
+        (me/occur-url)
+      (me/occur-browse-url-in-buffer)))
+
+  :hook ((occur-mode-hook . hl-line-mode)
+         (occur-mode-hook . (lambda ()
+                              (toggle-truncate-lines t))))
+  :bind (("M-s u" . me/occur-visit-or-list-urls)
+         ("M-s M-o" . multi-occur)
+         :map occur-mode-map
+         ("t" . toggle-truncate-lines)))
+#+end_src
+
+*** Ripgrep (rg.el)
+:PROPERTIES:
+:CUSTOM_ID: h:31622bf2-526b-4426-9fda-c0fc59ac8f4b
+:END:
+
+This is a package that allows us to interface with the external command
+line program called "ripgrep".  My [[https://protesilaos.com/codelog/2020-03-25-emacs-ripgrep-rg/][video demo of rg.el]] (2020-03-25)
+covers the main features of this tool.
+
+What I find particularly appealing about =rg.el= is that it follows the
+interface paradigms of built-in Emacs functions, such as =grep= or =occur=.
+With regard to the latter, it even uses the same key to convert the
+results' buffer into an editable one: =e= (the ability to write changes is
+provided by the =wgrep= package that [[#h:42624165-f4cb-4318-abce-c11232426880][I define right above]]).
+
+Furthermore, =rg.el= interfaces with =ibuffer=, another built-in package, to
+list saved searches (see my =me/rg-save-search-as-name= in the package
+declaration below).  Saved searches are regular buffers.  You can switch
+to any of them the normal way.
+
+While inside of an =rg.el= buffer, hit =m= to produce a transient menu from
+where you can refine your search.  This works just like =magit=.  In
+addition, you can consult the universal =C-h m= for documentation
+concerning the major mode you are in.
+
+Concerning the key bindings for navigating the results buffer, I find
+that the standard motions should retain their general function, while
+moving between file headings can be done with =M-{n,p}=.
+
+=rg.el= is designed in such a way that it offers useful functionality
+without depending on a particular completion framework (e.g. Ivy, Helm).
+I consider this an advantage, especially when combined with the overall
+alignment of this package with standard Emacs tools.
+
+Also see my configurations for [[#h:7862f39e-aed0-4d02-9f1e-60c4601a9734][project-related commands]].
+
+#+begin_src emacs-lisp
+(use-package rg
+  :ensure
+  :config
+  (setq rg-group-result t)
+  (setq rg-hide-command t)
+  (setq rg-show-columns nil)
+  (setq rg-show-header t)
+  (setq rg-custom-type-aliases nil)
+  (setq rg-default-alias-fallback "all")
+
+  (rg-define-search me/rg-vc-or-dir
+    "RipGrep in project root or present directory."
+    :query ask
+    :format regexp
+    :files "everything"
+    :dir (or (vc-root-dir)              ; search root project dir
+             default-directory)         ; or from the current dir
+    :confirm prefix
+    :flags ("--hidden -g !.git"))
+
+  (rg-define-search me/rg-ref-in-dir
+    "RipGrep for thing at point in present directory."
+    :query point
+    :format regexp
+    :files "everything"
+    :dir default-directory
+    :confirm prefix
+    :flags ("--hidden -g !.git"))
+
+  (defun me/rg-save-search-as-name ()
+    "Save `rg' buffer, naming it after the current search query.
+
+This function is meant to be mapped to a key in `rg-mode-map'."
+    (interactive)
+    (let ((pattern (car rg-pattern-history)))
+      (rg-save-search-as-name (concat "«" pattern "»"))))
+
+  :bind (("M-s g" . me/rg-vc-or-dir)
+         ("M-s r" . me/rg-ref-in-dir)
+         :map rg-mode-map
+         ("s" . me/rg-save-search-as-name)
+         ("C-n" . next-line)
+         ("C-p" . previous-line)
+         ("M-n" . rg-next-file)
+         ("M-p" . rg-prev-file)))
+#+end_src
+
+* General movements and motions
+:PROPERTIES:
+:CUSTOM_ID: h:9aa933d2-70a9-426a-aeb2-2fa21bc67d97
+:END:
+
+I generally rely on the default keys to move around (plus my Super-KEY
+additions to economise on some repetitive tasks).  There are, however,
+some motions that are rather cumbersome or too specialised.  While there
+are some commands that are not available at all.  For those cases, I use
+custom functions and/or remapped key bindings, as well as carefully
+considered external packages.
+
+** Custom commands in line with simple.el and lisp.el
+:PROPERTIES:
+:CUSTOM_ID: h:2442f3bf-3ffb-431d-82d9-8a44954355b1
+:END:
+
+The subsections provided herein contain small functions that facilitate
+my day-to-day work with Emacs.  They are written by me, unless otherwise
+noted, and typically tweak or extend some built-in functionality.  I
+also use these code blocks to map certain useful built-in functions to
+my preferred key bindings.
+
+The commands are organised per their role.  If you are viewing the
+source version of this document, you can place the point somewhere in
+these opening paragraphs and use =C-x n s= (=org-narrow-to-subtree=) to
+focus on the relevant parts.  Remember that widening always happens with
+=C-x n w= (=widen=).
+
+*** Custom commands for lines
+:PROPERTIES:
+:CUSTOM_ID: h:5cfe0052-b825-468c-9765-9002665c7762
+:END:
+
+The docstrings of my functions here should offer you all the information
+you need.  Just a couple of notes:
+
++ =delete-blank-lines= is normally mapped to =C-x C-o=, whereas I also bind
+  it to =M-o=, which makes it symmetrical with =open-line= (=C-o=).
+
++ By default, =M-SPC= (=just-one-space=) will reduce multiple spaces into a
+  single one, while =M-\= (=delete-horizontal-space=) will remove all space
+  at once from point to the end of the line.  Whereas the built-in
+  wrapper of =cycle-spacing= lets us economise on key bindings: a single
+  invocation will leave one space, a second removes all space, while a
+  third consecutive call restores the original state.
+
++ The =me/line-p= macro is a general purpose utility to confirm a match
+  for a regular expression on a given line (1 is line at point).  Refer
+  to the section on [[#h:66dd425b-4827-47eb-ac14-ac672596114d][custom commands for text insertion or manipulation]],
+  specifically its =me/text-mode-heading=, for a demonstration of how
+  the derived functions are used.
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    (defun me/new-line-below (&optional arg)
+      "Create an empty line below the current one.
+  Move the point to the absolute beginning.  Adapt indentation by
+  passing \\[universal-argument].  Also see `me/new-line-above'."
+      (interactive "P")
+      (end-of-line)
+      (if arg
+          (newline-and-indent)
+        (newline)))
+
+    (defun me/new-line-above (&optional arg)
+      "Create an empty line above the current one.
+  Move the point to the absolute beginning.  Adapt indentation by
+  passing \\[universal-argument]."
+      (interactive "P")
+      (let ((indent (or arg nil)))
+        (if (or (bobp)
+                (line-number-at-pos 1))
+            (progn
+              (beginning-of-line)
+              (newline)
+              (forward-line -1))
+          (forward-line -1)
+          (me/new-line-below indent))))
+
+    (defun me/copy-line-or-region (&optional arg)
+      "Kill-save the current line or active region.
+  With \\[universal-argument] duplicate the target instead.  When
+  region is active, also apply context-aware indentation while
+  duplicating."
+      (interactive "P")
+      (let* ((rbeg (region-beginning))
+             (rend (region-end))
+             (pbol (point-at-bol))
+             (peol (point-at-eol))
+             (indent (if (eq (or rbeg rend) pbol) nil arg)))
+        (if arg
+            (progn
+              (if (use-region-p)
+                  (progn
+                    (copy-region-as-kill rbeg rend)
+                    (when (eq (point) rbeg)
+                      (exchange-point-and-mark))
+                    (me/new-line-below indent))
+                (copy-region-as-kill pbol peol)
+                (me/new-line-below))
+              (yank))
+          (copy-region-as-kill pbol peol)
+          (message "Current line copied"))))
+
+    (defun me/yank-replace-line-or-region ()
+      "Replace line or region with latest kill.
+  This command can then be followed by the standard
+  `yank-pop' (default is bound to \\[yank-pop])."
+      (interactive)
+      (if (use-region-p)
+            (delete-region (region-beginning) (region-end))
+        (delete-region (point-at-bol) (point-at-eol)))
+        (yank))
+
+    (defun me/multi-line-next ()
+      "Move point 15 lines down."
+      (interactive)
+      (forward-line 15))
+
+    (defun me/multi-line-prev ()
+      "Move point 15 lines up."
+      (interactive)
+      (forward-line -15))
+
+    (defun me/kill-line-backward ()
+      "Kill from point to the beginning of the line."
+      (interactive)
+      (kill-line 0))
+
+    ;; Based on `org--line-empty-p'.
+    (defmacro me/line-p (name regexp)
+      "Make NAME function to match REGEXP on line n from point."
+      `(defun ,name (n)
+         (save-excursion
+           (and (not (bobp))
+                (or (beginning-of-line n) t)
+                (save-match-data
+                  (looking-at ,regexp))))))
+
+    (me/line-p
+     me/empty-line-p
+     "[\s\t]*$")
+
+    (me/line-p
+     me/indent-line-p
+     "^[\s\t]+")
+
+    (me/line-p
+     me/non-empty-line-p
+     "^.*$")
+
+    (me/line-p
+     me/text-list-line-p
+     "^\\([\s\t#*+]+\\|[0-9]+[).]+\\)")
+
+    (me/line-p
+     me/text-heading-line-p
+     "^[=-]+")
+
+    :bind (("C-S-w" . me/copy-line-or-region)
+           ("C-S-y" . me/yank-replace-line-or-region)
+           ("M-SPC" . cycle-spacing)
+           ("M-o" . delete-blank-lines)   ; alias for C-x C-o
+           ("M-k" . me/kill-line-backward)
+           ("C-S-n" . me/multi-line-next)
+           ("C-S-p" . me/multi-line-prev)
+           ("<C-return>" . me/new-line-below)
+           ("<C-S-return>" . me/new-line-above)))
+#+end_src
+
+*** Custom commands for text insertion or manipulation
+:PROPERTIES:
+:CUSTOM_ID: h:66dd425b-4827-47eb-ac14-ac672596114d
+:END:
+
++ Insert pairs with completion :: With =me/insert-pair-completion= I
+  solve the problem of having to define a potentially large set of key
+  bindings for the specialised task of inserting a pair of delimiters.
+  Now I define an association list with the pairs I am interested in and
+  let that function do the work.
+
++ Plain text headings :: =me/text-mode-heading= is my solution to the
+  problem of having to insert numerous characters below a line of text
+  so that it looks like a heading.  I do this on occasion with emails,
+  git commits, and the like, where a simple format is sufficient for the
+  task at hand (Org is fine in general, though it definitely is overkill
+  for such scenaria---use Org when you need its advanced
+  text-manipulation functions and integration with its numerous extras).
+  The =me/line-p= macro from the section on [[#h:5cfe0052-b825-468c-9765-9002665c7762][custom commands for lines]]
+  helps me define checks for what is on a given line, in order to
+  determine whether it should be excluded from becoming a heading or
+  not.
+
++ Change case "do what I mean" :: Emacs provides =*-dwim= versions of its
+  commands for changing the casing of a word or a region.  With an
+  active region, they operate on it, else they operate on the word.  I
+  bind them to the keys where you would find the originals (which, in
+  turn, render the region-specific variants redundant).
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :config
+    ;; Got those numbers from `string-to-char'
+    (defconst me/insert-pair-alist
+      '(("' Single quote" . (39 39))           ; ' '
+        ("\" Double quotes" . (34 34))         ; " "
+        ("` Elisp quote" . (96 39))            ; ` '
+        ("‘ Single apostrophe" . (8216 8217))  ; ‘ ’
+        ("“ Double apostrophes" . (8220 8221)) ; “ ”
+        ("( Parentheses" . (40 41))            ; ( )
+        ("{ Curly brackets" . (123 125))       ; { }
+        ("[ Square brackets" . (91 93))        ; [ ]
+        ("< Angled brackets" . (60 62))        ; < >
+        ("« Εισαγωγικά Gr quote" . (171 187))  ; « »
+        ("= Equals signs" . (61 61))           ; = =
+        ("* Asterisks" . (42 42))              ; * *
+        ("_ underscores" . (95 95)))           ; _ _
+      "Alist of pairs for use with `me/insert-pair-completion'.")
+
+    (defun me/insert-pair-completion (&optional arg)
+      "Insert pair from `me/insert-pair-alist'."
+      (interactive "P")
+      (let* ((data me/insert-pair-alist)
+             (chars (mapcar #'car data))
+             (choice (completing-read "Select character: " chars nil t))
+             (left (cadr (assoc choice data)))
+             (right (caddr (assoc choice data))))
+        (insert-pair arg left right)))
+
+    (defun me/text-mode-heading (&optional arg)
+      "Insert equal length heading delimiter below current line.
+
+  A heading delimiter is drawn as a series of dashes (-).  With
+  optional ARG, i.e. by prefixing \\[universal-argument], draw the
+  heading delimiter with equals signs (=).  The latter is
+  considered a heading level 1, while the former is level 2.
+
+  A heading delimiter is inserted only when that would not mess up
+  with existing headings or lists.  In such cases, point will move
+  to the next line.  For the purposes of this command, text that
+  starts with a number and no further delimiter is not consider a
+  list element.
+
+  This command is meant to be used in `text-mode' buffers and
+  derivatives, such as `markdown-mode', though not in `org-mode'."
+      (interactive "P")
+      (cond
+       ((eq major-mode 'org-mode)
+        (user-error "Do not use `me/text-mode-heading' in `org-mode'!"))
+       ((derived-mode-p 'text-mode)
+        (let* ((count (- (point-at-eol) (point-at-bol)))
+               (char (string-to-char (if arg "=" "-"))))
+            (cond
+             ((and (eobp)
+                   (or (me/text-list-line-p 1)
+                       (me/text-heading-line-p 1)
+                       (me/empty-line-p 1)
+                       (me/indent-line-p 1)))
+              (newline 1))
+             ((or (me/empty-line-p 1)
+                  (me/indent-line-p 1))
+              (me/new-line-below))
+             ((or (me/text-list-line-p 1)
+                  (me/text-heading-line-p 2))
+              (if (me/empty-line-p 3)
+                  (beginning-of-line 3)
+                (me/new-line-below)))
+             (t
+              (me/new-line-below)
+              (insert-char char count nil)
+              (newline 2)))))))
+
+    :bind (("C-'" . me/insert-pair-completion)
+           ("M-'" . me/insert-pair-completion)
+           ("<C-M-backspace>" . backward-kill-sexp)
+           ("M-c" . capitalize-dwim)
+           ("M-l" . downcase-dwim)        ; "lower" case
+           ("M-u" . upcase-dwim)
+           :map text-mode-map
+           ("<M-return>" . me/text-mode-heading)))
+#+end_src
+
+*** Custom commands for object transposition
+:PROPERTIES:
+:CUSTOM_ID: h:b6d349c6-11f5-4c7a-8dda-fc32a76aa5b1
+:END:
+
++ Transpose or swap objects :: This is a series of functions that are
+  constructed from the =me/transpose= macro.  They concern larger text
+  objects: sentences, paragraphs, balanced expressions.  The idea is to
+  do a normal transposition of the text objects they operate on or, when
+  the region is active, to swap the object at mark (region beginning)
+  with the one at point (region end).
+
++ Transpose or swap words :: =me/transpose-words= follows the same
+  principles as the other "swap" commands.  Though it differs from the
+  built-in =transpose-words= while at the beginning or end of line where
+  it will only transpose the first or last two words after or before
+  point.  It thus avoids transposing words across lines or paragraphs,
+  which I never want.
+
++ Transpose characters :: =me/transpose-chars= simply tweak the way the
+  original command works, so that it /always/ transposes the two
+  characters before point.  This will no longer have the effect of
+  moving the character forward following repeated invocations of the
+  command.  Just a toggle to quickly fix the last typo.
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :commands (me/transpose-chars
+             me/transpose-lines
+             me/transpose-paragraphs
+             me/transpose-sentences
+             me/transpose-sexps
+             me/transpose-words)
+  :config
+  (defmacro me/transpose (name scope &optional doc)
+    "Macro to produce transposition functions.
+NAME is the function's symbol.  SCOPE is the text object to
+operate on.  Optional DOC is the function's docstring.
+
+Transposition over an active region will swap the object at
+mark (region beginning) with the one at point (region end)"
+    `(defun ,name (arg)
+       ,doc
+       (interactive "p")
+       (let ((x (format "%s-%s" "transpose" ,scope)))
+         (if (use-region-p)
+             (funcall (intern x) 0)
+           (funcall (intern x) arg)))))
+
+  (me/transpose
+   me/transpose-lines
+   "lines"
+   "Transpose lines or swap over active region.")
+
+  (me/transpose
+   me/transpose-paragraphs
+   "paragraphs"
+   "Transpose paragraphs or swap over active region.")
+
+  (me/transpose
+   me/transpose-sentences
+   "sentences"
+   "Transpose sentences or swap over active region.")
+
+  (me/transpose
+   me/transpose-sexps
+   "sexps"
+   "Transpose balanced expressions or swap over active region.")
+
+  (defun me/transpose-chars ()
+    "Always transposes the two characters before point.
+There is no 'dragging' the character forward.  This is the
+behaviour of `transpose-chars' when point is at end-of-line."
+    (interactive)
+    (transpose-chars -1)
+    (forward-char))
+
+  (defun me/transpose-words (arg)
+    "Transpose words.
+
+If region is active, swap the word at mark (region beginning)
+with the one at point (region end).
+
+Otherwise, and while inside a sentence, this behaves as the
+built-in `transpose-words', dragging forward the word behind the
+point.  The difference lies in its behaviour at the end or
+beginnning of a line, where it will always transpose the word at
+point with the one behind or ahead of it (effectively the
+last/first two words)."
+    (interactive "p")
+    (cond
+     ((use-region-p)
+      (transpose-words 0))
+     ((eq (point) (point-at-eol))
+      (transpose-words -1))
+     ((eq (point) (point-at-bol))
+      (forward-word 1)
+      (transpose-words 1))
+     (t
+      (transpose-words arg))))
+
+  :bind (("C-t" . me/transpose-chars)
+         ("C-x C-t" . me/transpose-lines)
+         ("C-S-t" . me/transpose-paragraphs)
+         ("C-x M-t" . me/transpose-sentences)
+         ("C-M-t" . me/transpose-sexps)
+         ("M-t" . me/transpose-words)))
+#+end_src
+
+*** Custom commands for marking syntactic constructs
+:PROPERTIES:
+:CUSTOM_ID: h:19076ddf-8c55-48da-81a3-129b18cf62c0
+:END:
+
+I tried working with the external =expand.el= package, but realised I only
+ever used a tiny subset of its commands.  Instead of paying the penalty,
+I am opting to tweak the built-in functions for marking the syntactic
+constructs that are specific to my needs.
+
+All of the following accept a universal argument for specifying the
+total count of objects to mark and in which direction (e.g. =C-u -3= will
+mark the current word and two more before it).  Repeated calls of the
+command incrementally expand the region in the given direction.
+
++ Mark symbol at point :: Marks the whole symbol at point.  Recall that
+  "symbol" refers to a proper/unique name, such as those of functions.
+  That granted, =me/mark-symbol= will apply to regular words if no
+  symbol is available, making it ideal as a general purpose utility.
+
++ Mark word at point :: Unlike the built-in =mark-word= which only
+  highlights the word from point to either of its boundaries, my
+  =me/mark-word= operates on the entire word, while retaining the rest
+  of the functionality (the use of the universal argument and
+  incremental expansion, noted above).  This command is not meant for
+  regular use, as it is covered by =me/mark-symbol=.  Instead it is
+  reserved for some surgical intervention in the context of keyboard
+  macros and the like.
+
++ Mark sexp backward :: =me/mark-sexp-backward= is a simple tweak over
+  the default command for marking symbolic expressions (=mark-sexp=),
+  which tells it to always move backward.
+
++ Mark constructs DWIM :: =me/mark-construct-dwim= is the command that
+  wraps all of the above except =me/mark-word= (due to its specificity)
+  in a convenient package.
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :commands (me/mark-symbol
+               me/mark-sexp-backward)
+    :config
+    (defmacro me/mark (name object &optional docstring)
+      "Produce function for marking small syntactic constructs.
+  NAME is how the function should be called.  OBJECT is its scope.
+  Optional DOCSTRING describes the resulting function.
+
+  This is a slightly modified version of the built-in `mark-word'."
+      `(defun ,name (&optional arg allow-extend)
+         ,docstring
+         (interactive "P\np")
+         (let ((x (format "%s-%s" "forward" ,object)))
+           (cond ((and allow-extend
+                       (or (and (eq last-command this-command) (mark t))
+                           (region-active-p)))
+                  (setq arg (if arg (prefix-numeric-value arg)
+                              (if (< (mark) (point)) -1 1)))
+                  (set-mark
+                   (save-excursion
+                     (goto-char (mark))
+                     (funcall (intern x) arg)
+                     (point))))
+                 (t
+                  (let ((bounds (bounds-of-thing-at-point (intern ,object))))
+                    (unless (consp bounds)
+                      (user-error "No %s at point" ,object))
+                    (if (>= (prefix-numeric-value arg) 0)
+                        (goto-char (car bounds))
+                      (goto-char (cdr bounds)))
+                    (push-mark
+                     (save-excursion
+                       (funcall (intern x) (prefix-numeric-value arg))
+                       (point)))
+                    (activate-mark)))))))
+
+    (me/mark
+     me/mark-word
+     "word"
+     "Mark the whole word at point.
+  This function is a slightly modified version of the built-in
+  `mark-word', that I intend to use only in special circumstances,
+  such as when recording a keyboard macro where precision is
+  required.  For a general purpose utility, use `me/mark-symbol'
+  instead.")
+
+    (me/mark
+     me/mark-symbol
+     "symbol"
+     "Mark the whole symbol at point.
+  With optional ARG, mark the current symbol and any remaining
+  ARGth symbols away from point.  A negative argument moves
+  backward. Repeated invocations of this command mark the next
+  symbol in the direction originally specified.
+
+  In the absence of a symbol and if a word is present at point,
+  this command will operate on it as described above.")
+
+    (defun me/mark-sexp-backward (&optional arg)
+      "Mark previous or ARGth balanced expression[s].
+  Just a convenient backward-looking `mark-sexp'."
+      (interactive "P")
+      (if arg
+          (mark-sexp (- arg) t)
+        (mark-sexp (- 1) t)))
+
+    (defun me/mark-construct-dwim (&optional arg)
+      "Mark symbol or balanced expression at point.
+  A do-what-I-mean wrapper for `me/mark-sexp-backward',
+  `mark-sexp', and `me/mark-symbol'.
+
+  When point is over a symbol, mark the entirety of it.  Regular
+  words are interpreted as symbols when an actual symbol is not
+  present.
+
+  For balanced expressions, a backward match will happen when point
+  is to the right of the closing delimiter.  A forward match is the
+  fallback condition and should work when point is before a
+  balanced expression, with or without whitespace in between it an
+  the opening delimiter.
+
+  Optional ARG will mark a total of ARGth objects while counting
+  the current one (so 3 would be 1+2 more).  A negative count moves
+  the mark backward (though that would invert the backward-moving
+  sexp matching of `me/mark-sexp-backward', so be mindful of
+  where the point is).  Repeated invocations of this command
+  incrementally mark objects in the direction originally
+  specified."
+      (interactive "P")
+      (cond
+       ((symbol-at-point)
+        (me/mark-symbol arg t))
+       ((eq (point) (cdr (bounds-of-thing-at-point 'sexp)))
+        (me/mark-sexp-backward arg))
+       (t
+        (mark-sexp arg t))))
+
+    :bind (("M-@" . me/mark-word)       ; replaces `mark-word'
+           ("C-M-SPC" . me/mark-construct-dwim)))
+#+end_src
+
+*** Custom commands for Elisp code navigation
+:PROPERTIES:
+:CUSTOM_ID: h:7394d56e-4879-4e30-a446-a7e44e3e6969
+:END:
+
+/Work in progress 2020-11-06./
+
+Emacs covers most of my needs with key bindings such as =C-M-n=
+(=forward-list=), =C-M-b= (=backward-sexp=), and the like.  They have good
+mnemonics and make my life easier when working with structured text
+(basically just Elisp).
+
+The few motions that I miss are defined here.
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :config
+  (defun me/downward-list (&optional arg)
+    "Like `backward-up-list' but defaults to a forward motion.
+With optional ARG, move that many times in the given
+direction (negative is forward due to this being a
+'backward'-facing command)."
+    (interactive "P")
+    (backward-up-list (or arg -1)))
+  :bind ("C-M-d" . me/downward-list)) ; inverse of C-M-u
 #+end_src
 
 * Directory, buffer, window management
@@ -771,7 +1470,7 @@ afterwards exit the search altogether."
     :after dired
     :config
     (setq find-ls-option
-	  '("-ls" . "-AGFhlv --group-directories-first --time-style=long-iso"))
+	  '("-ls" . "-AGFhlv"))
     (setq find-name-arg "-iname"))
 
 #+end_src
@@ -846,7 +1545,7 @@ afterwards exit the search altogether."
   :CUSTOM_ID: h:fa8bd8af-de14-489b-bc56-1a9bb3ef9f0f
   :END:
 
-** Built-in calendar
+** Calendar
    :PROPERTIES:
    :CUSTOM_ID: h:b4040bc0-7a2a-4f17-824d-42de621bd1b9
    :END:
@@ -858,31 +1557,491 @@ afterwards exit the search altogether."
   (setq calendar-date-style 'iso))
 #+end_src
 
-** Git front-end (Magit) and relevant configurations
-   :PROPERTIES:
-   :CUSTOM_ID: h:76d1b392-e693-40dc-b320-d4c1047115ab
-   :END:
+** Diary
+:PROPERTIES:
+:CUSTOM_ID: h:b07e88e2-c822-4ca0-aeb5-894a208139a7
+:END:
 
-*** Base Magit settings
-    :PROPERTIES:
-    :CUSTOM_ID: h:21ca155a-d0d7-4710-b34a-a0d7a901ac0d
-    :END:
+Emacs comes with a built-in facility to record tasks and create
+notifications for them.  It is simply called =diary=.  I am still
+assessing its overall utility in my workflow, though these
+configurations should be good enough at this stage.
 
-Magit has good defaults.  I only found a few things that I would like to
-customise, which I do in the following package declarations.
+#+begin_src emacs-lisp
+(use-package diary-lib
+  :config
+  (setq diary-file "~/.emacs.d/diary")
+  (setq diary-entry-marker "diary")
+  (setq diary-show-holidays-flag t)
+  (setq diary-header-line-flag nil)
+  (setq diary-mail-addr "public@protesilaos.com")
+  (setq diary-mail-days 3)
+  (setq diary-number-of-entries 3)
+  (setq diary-comment-start ";")
+  (setq diary-comment-end "")
+  (setq diary-date-forms
+        '((day "/" month "[^/0-9]")
+          (day "/" month "/" year "[^0-9]")
+          (day " *" monthname " *" year "[^0-9]")
+          (monthname " *" day "[^,0-9]")
+          (monthname " *" day ", *" year "[^0-9]")
+          (year "[-/]" month "[-/]" day "[^0-9]")
+          (dayname "\\W"))))
+#+end_src
+
+** Version control tools
+:PROPERTIES:
+:CUSTOM_ID: h:0e2fe4c7-9d4b-4570-a293-9a9629021ff7
+:END:
+
+*** Diff-mode
+:PROPERTIES:
+:CUSTOM_ID: h:2ff46d23-09d5-4d92-b0af-2339dc19719f
+:END:
+
+This covers the standard =diff-mode=, which I use when interfacing with
+the built-in Version Control framework (see the [[#h:31deeff4-dfae-48d9-a906-1f3272f29bc9][section on VC]]), but also
+find while browsing various newsgroups via Gnus (see [[#h:5ad80664-3163-4d9d-be65-462637d77903][email settings]]).
+
+Overview of these tweaks:
+
++ Always start the buffer in a read-only state.  A typo will mess things
+  up when trying to apply a patch.
++ After applying a diff hunk move on to the next one.
++ Update hunk headers automatically following an edit to the diff.
++ Do not show word-wise ("refined") changes upon activation.  I prefer
+  to do so manually with =C-c C-b= for the current diff hunk.  All such
+  highlights are removed if you generate the buffer again (with =g= as
+  expected) and the default is to not show word-wise changes.
++ Do not prettify headers.  I like the standard "patch" looks.  It also
+  makes it easier to copy the diff elsewhere such as in an email or on
+  an issue tracker.
++ Do not do any further syntax highlighting.  This is not the place to
+  check your pretty code, plus it will most likely render colours highly
+  inaccessible.
+
+Basics for =diff-mode= buffers (as always you can learn more about the
+current buffer's major mode with =C-h m=---read [[#h:83730fe8-d917-4d94-96f4-bbc5c900fe38][How do you learn Emacs?]] in
+the FAQ below):
+
++ =C-c C-c= or =M-o= takes you to the point of the changes in the source
+  file.  If you run this of the diff hunk's heading, you go to the
+  beginning of the context.  But if you place the point somewhere inside
+  of the diff's added changes or context, you will visit that exact
+  position in the original file (does not work for removed text because
+  technically it does not exist).  Awesome feature!
++ When working with patches to source code, which are distributed
+  e.g. through email, you can apply the current hunk with =C-c C-a= or
+  test for compatibility with =C-c C-t=.  This is a nice way to easily
+  merge contributions from others, without having to go through the
+  workflow of some proprietary Git/Version-Control forge.
++ By default =C-c C-n= offers a convenience wrapper for Emacs' narrowing
+  commands (such as =C-x n n= for =narrow-to-region=.  The standard is to
+  narrow to the current diff hunk.  With the =C-u= prefix it will narrow
+  to the current file instead (obviously this only makes sense when
+  inspecting a multi-file set of changes).  If you use the default, you
+  must manually exit narrowing with the standard =C-x n w=, but for this
+  case I prefer =me/diff-restrict-view-dwim= which will widen the view
+  when narrowing is already in effect, else narrow as intended (I bind
+  it to =C-c C-n= to replace the original).
++ With =me/diff-buffer-with-file= I have a simple wrapper around a
+  built-in command that compares a buffer to its underlying file.  This
+  compares the changes made since the last save and my wrapper is about
+  picking the current buffer directly.  If there are no differences,
+  then the command with run =vc-diff= instead.  Note that in my
+  configurations for the [[*Generic version control (VC) framework][Generic version control (VC) framework]], I remap
+  the keys that pertain to diffs.
++ With =M-n= and =M-p= you move between hunks.  With =M-}= and =M-{= or =M-N=, =M-P=
+  do the same between files.
+
+#+begin_src emacs-lisp
+(use-package diff
+  :commands me/diff-refine-buffer
+  :config
+  (setq diff-default-read-only t)
+  (setq diff-advance-after-apply-hunk t)
+  (setq diff-update-on-the-fly t)
+  ;; The following are from Emacs 27.1
+  (setq diff-refine nil)                ; I do it on demand
+  (setq diff-font-lock-prettify nil)    ; better for patches
+  (setq diff-font-lock-syntax nil)      ; good for accessibility
+
+  (defun me/diff-buffer-with-file (&optional arg)
+    "Compare buffer to its file, else run `vc-diff'.
+With \\[universal-argument] also enable highlighting of word-wise
+changes, local to the current buffer."
+    (interactive "P")
+    (let ((buf nil))     ; this method will "fail" if multi diff buffers
+      (if (buffer-modified-p)
+          (progn
+            (diff-buffer-with-file (current-buffer))
+            (setq buf "*Diff*"))
+        (vc-diff)
+        (setq buf "*vc-diff*"))
+      (when arg
+        (with-current-buffer (get-buffer buf)
+          (setq-local diff-refine 'font-lock)))))
+
+  (defun me/diff-refine-buffer ()
+    "Produce word-wise, 'refined' diffs in `diff-mode' buffer.
+Also see `me/diff-refine-hunk-or-buf' that is a wrapper for the
+current command."
+    (interactive)
+    (let ((position (point)))
+      (when (derived-mode-p 'diff-mode)
+        (setq-local diff-refine 'font-lock)
+        (font-lock-flush (point-min) (point-max))
+        (goto-char position))))
+
+  (defun me/diff-refine-hunk-or-buf (&optional arg)
+    "Apply word-wise, 'refined' diffs to hunk or buffer.
+With prefix ARG (\\[universal-argument]), refine the entire
+buffer, else the diff hunk at point.
+
+This is a wrapper around `me/diff-refine-buffer' and
+`diff-refine-hunk', meant to economise on key bindings."
+    (interactive "P")
+    (if arg
+        (me/diff-refine-buffer)
+      (diff-refine-hunk)))
+
+  (defun me/diff-restrict-view-dwim (&optional arg)
+    "Use `diff-restrict-view', or widen when already narrowed.
+By default the narrowing effect applies to the focused diff hunk.
+With \\[universal-argument] do it for the current file instead."
+    (interactive "P")
+    (when (derived-mode-p 'diff-mode)
+      (if (buffer-narrowed-p)
+          (progn
+            (widen)
+            (message "Widened the view"))
+        (if arg
+            (progn
+              (diff-restrict-view arg)
+              (message "Narrowed to file"))
+          (diff-restrict-view)
+          (message "Narrowed to diff hunk")))))
+
+  ;; `me/diff-buffer-with-file' replaces the default for `vc-diff'
+  ;; (which I bind to another key---see VC section).
+  :bind (("C-x v =" . me/diff-buffer-with-file)
+         :map diff-mode-map
+         ("C-c C-b" . me/diff-refine-hunk-or-buf) ; replace `diff-refine-hunk'
+         ("C-c C-n" . me/diff-restrict-view-dwim)))
+#+end_src
+
+*** Generic version control (VC) framework
+:PROPERTIES:
+:CUSTOM_ID: h:31deeff4-dfae-48d9-a906-1f3272f29bc9
+:END:
+
+VC is a generic framework that works with several version control
+systems, else "backends".  In practice though, I only ever use it with
+=git=.  Compared with =magit= (see section on [[#h:76d1b392-e693-40dc-b320-d4c1047115ab][Magit configs]]), =vc= offers a
+more abstract, buffer-oriented workflow that, I feel, covers all common
+version control cases.
+
+With VC we can track and ignore files, commit changes, view diffs and
+logs, push and pull from a remote…  Everything you would expect from a
+version control system.  But I am not sure it is possible or convenient
+to perform tasks such as staging only a particular part of a diff,
+handling multiple remotes, interactively rebasing the commit log, etc.
+
+As such, I employ VC as my generalist interface to the most common Git
+interactions: diffs, commits, logs.  While I rely on Magit for expedient
+access to the more advanced features of Git, all of which are rendered
+approachable through an interactive/modal interface.
+
+I started using VC with this a common scenario: to produce a diff of my
+current changes formatted as a ready-to-apply patch.  This is done with
+=vc-diff= (also see the =vc-git-diff-switches= variable).  A diff hunk can
+be applied while in the =*vc-diff*= buffer by hitting =C-c C-a=.  Fairly
+easy.  One can always save the diff buffer using the standard =C-x C-w=
+command (=write-file=).  Use these to send patches (e.g. via email),
+without having to go through proprietary web tools.
+
+Another nice feature is a region-specific commit log with =C-x v h=
+(=vc-region-history=).  Highlight a region and run the command to get a
+clear view of how it took form.  Quite an easy way to "git blame".  For
+a more macroscopic view of the file's entire history you can always rely
+on =C-x v g= or my alias =C-x v a= which calls =vc-annotate=.  Commits are
+colour-coded with those on the red side of the spectrum being the newest
+ones, while those on the blue end representing the older ones.
+
+=C-x v v= (=vc-next-action=) is a hidden gem: a paradigm of minimalism done
+right.  On a new project it will first ask you for a backend.  Selecting
+=git= will run =git init=.  Invoking the command again will track the file
+and commit the changes.  If the file is already being tracked, it will
+just proceed to the next step.  It always follows a logical sequence
+which translates into a powerful metaphor of going through the process
+of committing changes to files.
+
+The commit buffer presents you with a summary section followed by the
+body of the commit message, separated by an empty line (shown as a
+border) as per the conventions that govern good commit messages.  In the
+lower part you can see the affected files (just the current file by
+default).  The standard =C-c C-c= confirms the commit, while =C-c C-k=
+cancels it.  Furthermore, there is =C-c C-f= to view the file set
+concerned (in case it is not already visible below the message area), as
+well as =C-c C-d= to produce a diff of what is being committed.
+
+You can review the commit log for the current file with =C-x v l=
+(=vc-print-log=) or for the entirety of the current project with =C-x v L=
+(=vc-print-root-log=).  From there you can display any diff with =d= or find
+the prior state of the commit at point with =f=.  Use the latter as a
+starting point for reverting to a prior state.  Also note that while
+inside the root log view, you can use an active region to show diffs in
+that range of commits.
+
+With =vc-dir=, which I rebind to the more logical "project" mnemonic of
+=C-x v p= (=me/vc-dir-project=), you can mark with =m= several files to add
+to a commit.  Use =M= to mark all files with the same status.  This mode
+offers easy access to the standard VC actions.  To commit the file at
+point or the marked ones hit =v=.  To push do =P=.  Same principle for
+diffs, logs, etc.
+
+By the way, rebinding =vc-dir= has another upside of allowing its original
+key binding to be assigned to =vc-diff=; which in turn makes that
+mnemonically consistent with the =C-x v D= sequence, else =vc-root-diff=
+(make sure to check my key re-bindings or aliases).
+
+Some more common actions (read their docstrings for further help):
+
+| Command         | Key chord | VC-dir key |
+|-----------------+-----------+------------|
+| vc-update       | C-x v +   | +          |
+| vc-push         | C-x v P   | P          |
+| vc-log-incoming | C-x v I   | I          |
+| vc-log-outgoing | C-x v O   | O          |
+
+Based on these (and there are more), you can already see how VC may be
+used as your main tool for version control, from committing changes, to
+pulling/pushing from/to a remote, viewing commit logs, etc.  It depends
+on your needs and preferences.  Run =C-x v C-h= to get a full list of the
+possible commands.  Read the docstring of each command for further
+information.  Then in each of the various VC modes try =C-h m= for further
+help.  Also consult the manual and make liberal use of =C-h f= or =C-h v=.
+
+Changes to all tracked files are highlighted in the fringe thanks to the
+=diff-hl= package which is [[#h:5b71e71f-353f-4290-951b-3fc575c0fcba][defined elsewhere in this document]] (as I
+consider it an "interface" element).  Any rules that control the
+placement of VC-related (and other) buffers are defined in the section
+on [[#h:3d8ebbb1-f749-412e-9c72-5d65f48d5957][window rules and basic tweaks]] (specifically, refer to the variable
+=display-buffer-alist=).
+
+Also watch my [[https://protesilaos.com/codelog/2020-03-30-emacs-intro-vc/][Introduction to the Emacs Version Control framework]]
+(2020-03-30).
+
+*Careful with the keybindings* I define.  Many of them do other things by
+default and /I might still review them further/.  When in doubt, stick
+with the defaults.
+
+#+begin_src emacs-lisp
+(use-package vc
+  :config
+  (setq vc-find-revision-no-save t)
+
+  (use-package add-log
+    :config
+    ;; I use a different account for git commits
+    (setq add-log-mailing-address "info@protesilaos.com")
+    (setq add-log-keep-changes-together t))
+
+  (use-package log-view
+    :config
+    (defun me/vc-print-log (&optional arg)
+      "Like `vc-print-log' but for a custom fileset.
+
+With optional prefix ARG (\\[universal-argument]), query for a
+number to limit the log to.  Then prompt the user for matching
+files in the `default-directory'.  A literal space delimits
+multiple files (inserting a space will renew the prompt, asking
+for another file match).
+
+In a `dired-mode' buffer, print log for the file at point, or any
+marked files, except for when a double prefix argument is passed.
+A single prefix arg still provides for a limit to the log.
+
+If a double prefix ARG is passed, prompt for a limit and produce
+a log that covers all files in the present directory."
+      (interactive "P")
+      (let* ((lim (if arg
+                      (read-number "Limit log to N entries: " 5)
+                    20))
+             (dir default-directory)
+             (dotless directory-files-no-dot-files-regexp)
+             (files (directory-files dir nil dotless t))
+             (crm-separator " ")
+             (set (cond
+                   ((equal arg '(16))
+                    files)
+                   ((eq major-mode 'dired-mode)
+                    (dired-get-marked-files t nil))
+                   (t
+                    (completing-read-multiple
+                     "Select files in current dir: " files nil t))))
+             (backend (vc-backend set)))
+        (vc-print-log-internal backend set nil nil lim 'with-diff)))
+
+    (defun me/log-view-extract-commit ()
+      "Kill commit from around point in `vc-print-log'."
+      (interactive)
+      (let ((commit (cadr (log-view-current-entry (point) t))))
+        (kill-new (format "%s" commit))
+        (message "Copied: %s" commit)))
+
+    (defvar me/vc-shell-output "*vc-shell-output*"
+      "Name of buffer for VC-related shell output.")
+
+    (defun me/log-view-create-patch ()
+      "Create patch for commit at point in `log-view'."
+      (interactive)
+      (let* ((commit (cadr (log-view-current-entry (point) t)))
+             (vc-dir (or (vc-root-dir) default-directory))
+             (dirs (list "~/" "~/Desktop/" vc-dir))
+             (out-dir ;; (read-directory-name "Output directory: ")
+              (completing-read "Output directory: " dirs))
+             (buf (get-buffer-create me/vc-shell-output)))
+        (shell-command
+         (format "git format-patch -1 %s -o %s" commit out-dir) buf)
+        (message "Prepared patch for `%s' and sent it to %s"
+                 (propertize commit 'face 'bold)
+                 (propertize out-dir 'face 'success))))
+
+    :bind (("C-x v SPC" . me/vc-print-log)
+           :map log-view-mode-map
+           ("<tab>" . log-view-toggle-entry-display)
+           ("<return>" . log-view-find-revision)
+           ("c" . me/log-view-create-patch)
+           ("w" . me/log-view-extract-commit)
+           ("s" . vc-log-search)
+           ("o" . vc-log-outgoing)
+           ("f" . vc-log-incoming)
+           ("F" . vc-update)
+           ("P" . vc-push)))
+
+  :bind (("C-x v b" . vc-retrieve-tag)  ; "branch" switch
+         ("C-x v t" . vc-create-tag)
+         ("C-x v f" . vc-log-incoming)  ; the actual git fetch
+         ("C-x v F" . vc-update)        ; "F" because "P" is push
+         ("C-x v d" . vc-diff)))
+
+(use-package vc-dir
+  :config
+  (defun me/vc-dir (&optional arg)
+    "Run `vc-dir' for the current project or directory.
+With optional ARG (\\[universal-argument]), use the present
+working directory, else default to the root of the current
+project, as defined by `vc-root-dir'."
+    (interactive "P")
+    (let ((dir (if arg default-directory (vc-root-dir))))
+      (vc-dir dir)))
+  :bind (("C-x v p" . me/vc-dir)
+         :map vc-dir-mode-map
+         ("b" . vc-retrieve-tag)
+         ("t" . vc-create-tag)
+         ("o" . vc-log-outgoing)
+         ("f" . vc-log-incoming) ; replaces `vc-dir-find-file' (use RET)
+         ("F" . vc-update)       ; symmetric with P: `vc-push'
+         ("d" . vc-diff)         ; align with D: `vc-root-diff'
+         ("k" . vc-dir-clean-files)))
+
+(use-package vc-git
+  :config
+  (setq vc-git-diff-switches '("--patch-with-stat" "--histogram"))
+  (setq vc-git-print-log-follow t)
+  (setq vc-git-revision-complete-only-branches nil) ; Emacs 28
+  (setq vc-git-root-log-format
+        '("%d%h %ad %an: %s"
+          ;; The first shy group matches the characters drawn by --graph.
+          ;; We use numbered groups because `log-view-message-re' wants the
+          ;; revision number to be group 1.
+          "^\\(?:[*/\\| ]+ \\)?\
+\\(?2: ([^)]+)\\)?\\(?1:[0-9a-z]+\\) \
+\\(?4:[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\) \
+\\(?3:.*?\\):"
+          ((1 'log-view-message)
+           (2 'change-log-list nil lax)
+           (3 'change-log-name)
+           (4 'change-log-date)))))
+
+(use-package vc-annotate
+  :config
+  (setq vc-annotate-display-mode 'scale) ; scale to oldest
+  :bind (("C-x v a" . vc-annotate)       ; `vc-update-change-log' is not in git
+         :map vc-annotate-mode-map
+         ("<tab>" . vc-annotate-toggle-annotation-visibility)))
+#+end_src
+
+**** Commit log editing
+:PROPERTIES:
+:CUSTOM_ID: h:4df7a1f5-a144-4848-b3aa-8796d76d5fb9
+:END:
+
+The =log-edit= library defines a set of general commands that we can use
+to, inter alia, commit changes to Git, using the surprisingly powerful
+[[#h:31deeff4-dfae-48d9-a906-1f3272f29bc9][built-in Version Control (VC) framework]].
+
+Overview of the following tweaks:
+
++ While editing a commit message, only prompt for confirmation if the
+  list of files has changed since the beginning of the editing session.
++ Once the commit is done, remove its buffer.
++ Always add a newline.
++ Do not offer to manually write an =Author:= header.  Though this can be
+  useful if someone sends a patch.
+
+Also make sure to read the guide for [[https://chris.beams.io/posts/git-commit/][writing a Git commit message]].  I
+always use =auto-fill-mode= to wrap lines to the value of =fill-column= (see
+[[#h:c392fef1-17b7-4cc0-b0e2-2b3edd0eed3c][relevant configs]]).
+
+#+begin_src emacs-lisp
+(use-package log-edit
+  :config
+  (setq log-edit-confirm 'changed)
+  (setq log-edit-keep-buffer nil)
+  (setq log-edit-require-final-newline t)
+  (setq log-edit-setup-add-author nil))
+#+end_src
+
+*** Interactive git front-end (Magit)
+:PROPERTIES:
+:CUSTOM_ID: h:76d1b392-e693-40dc-b320-d4c1047115ab
+:END:
+
+As noted in the [[#h:31deeff4-dfae-48d9-a906-1f3272f29bc9][section on the built-in Version Control framework]] I use
+Magit for easy access to the /advanced features of Git/.  While I rely on
+the built-in tools for all day-to-day operations.
+
+Magit offers a modal interface where the full power of =git= is neatly
+organised in sets of keys that are directly accessible without holding
+down any modifiers.
+
+While inside the =magit-status= buffer, hit =?= to produce a transient menu
+with the possible vectors to action.  Do it again inside each of the
+Magit buffers to view the keys that work for their context.
+
+Consider viewing my [[https://protesilaos.com/codelog/2020-04-04-emacs-intro-magit/][Introduction to Magit]] (2020-04-04) for how to stage
+diffs, commit changes, view logs, create branches, and so on.
+
+**** Base Magit settings
+:PROPERTIES:
+:CUSTOM_ID: h:21ca155a-d0d7-4710-b34a-a0d7a901ac0d
+:END:
+
+Magit has great defaults.  I only found a few things that I would like
+to customise, which I do in the following package declarations.
 
 #+begin_src emacs-lisp
 (use-package magit
-  :ensure t
-  :defer t
-  :bind (("C-x g" . magit-status)
-         ("s-g" . magit-status)))
+  :ensure
+  :bind ("C-x g" . magit-status))
 #+end_src
 
-*** Git commits
-    :PROPERTIES:
-    :CUSTOM_ID: h:f851e0cc-099c-4309-8517-b2f20ab18ab4
-    :END:
+**** Magit commits
+:PROPERTIES:
+:CUSTOM_ID: h:f851e0cc-099c-4309-8517-b2f20ab18ab4
+:END:
 
 The following package is configured in accordance with the guidelines
 provided by this article on [[https://chris.beams.io/posts/git-commit/][writing a Git commit message]].  The gist is
@@ -903,602 +2062,664 @@ set elsewhere in this document to 72 characters long.
           "Reported-by"
           "Tested-by"
           "Reviewed-by"))
-  (setq magit-save-repository-buffers 'dontask)
   (setq git-commit-style-convention-checks
         '(non-empty-second-line
           overlong-summary-line)))
+#+end_src
+
+**** Magit diffs
+:PROPERTIES:
+:CUSTOM_ID: h:c7a465c1-f33a-42d8-9617-fff3e1460060
+:END:
+
+The settings below are for the diff screens that Magit produces.  I just
+want to highlight changes within a line, not just the line itself.  I
+enable it only for the focused hunk (there is an option for ='all=).
+
+#+begin_src emacs-lisp
+(use-package magit-diff
+  :after magit
+  :config
+  (setq magit-diff-refine-hunk t))
+#+end_src
+
+**** Magit repo list
+:PROPERTIES:
+:CUSTOM_ID: h:35972439-0b28-4d33-8091-c6b5f1f02579
+:END:
+
+When maintaining a number of projects, it sometimes is necessary to
+produce a full list of them with their corresponding Magit status.  That
+way you can determine very quickly which repositories need to be
+examined further.
+
+#+begin_src emacs-lisp
+(use-package magit-repos
+  :after magit
+  :commands magit-list-repositories
+  :config
+  (setq magit-repository-directories
+        '(("~/Git/Projects" . 1))))
+#+end_src
+
+*** Smerge and Ediff
+:PROPERTIES:
+:CUSTOM_ID: h:fb9e0507-5ab1-4ebd-8870-8c32cfe742c1
+:END:
+
+*Read this section, because it matters more than the code below it.*
+
+Sometimes we face a situation where we have conflicting versions of a
+file and the version control backend cannot solve them on its own.  This
+can happen fairly often when collaborating with other people or, more
+generally, when we keep our work spread across multiple feature branches
+with diverging histories.  Whenever such conflicts arise, Emacs will
+automatically annotate the offending files with special markers that
+show the conflicting differences.  Visiting those files will then
+activate =smerge-mode=.  At which point we are in control.
+
+Smerge revolves around the concept of dividing the conflicting part into
+an "upper" (red) and a "lower" section (green), possibly with their
+common ancestor or last point of convergence in the middle (yellow).
+
+With this in mind we can operate on the marked differences by relying on
+the functions that Smerge provides, all of which are accessed by default
+through the common prefix of =C-c ^=.  Start by typing the prefix followed
+by =C-h= to see all possible key chords.  These are the commands I have
+used the most:
+
++ =C-c ^ u= (=smerge-keep-upper=)
++ =C-c ^ l= (=smerge-keep-lower=)
++ =C-c ^ b= (=smerge-keep-base=)
++ =C-c ^ a= (=smerge-keep-all=)
++ =C-c ^ n= (=smerge-next=)
++ =C-c ^ p= (=smerge-prev=)
+
+Also check the =defhydra= I provide for it to make things simpler.
+
+Proceed to edit the file the way you want until no more conflicts exist.
+You can also do things through manual editing, with standard commands
+and motions, but that can be prone to errors (which lead to more
+conflicts).  At any moment in this process, you can switch to =ediff=,
+which offers a more powerful way of working with differences.  Type the
+key chord =C-c ^ E= (=smerge-ediff=).
+
+Ediff is a powerhouse that is likely to cover all your needs in this
+area (including those you are not aware of).  For our purposes, what
+matters is to understand the basic concepts.
+
+The way this tool works is that it starts by producing a layout of the
+two conflicting versions with access to a "control panel" for operating
+on them.  By default, the panel is positioned on a new frame, but I find
+that rather awkward---my config puts it inside an Emacs window instead.
+While focusing the control panel, you can move between each diff range
+with =n= and =p=.  The focused section will be coloured using red, green,
+and yellow, while all other diffs will be presented in gray.
+
+On each diff, you have three options: to use the version of buffer A
+(red), of buffer B (green), or a combination of the two.  The keys for
+each of those are =a=, =b=, and =+= respectively.  Your choice will be
+reflected in buffer C (the yellow one).  Use these to resolve all
+conflicts and then quit the session with =q=.
+
+Concerning the combination of versions between A and B, Ediff has the
+behaviour of also inserting as plain text the annotation markers that
+Smerge relied on.  As of this writing (2020-04-10), I am not aware of an
+automatic or convenient way to omit those prior to confirming our edits.
+To that end, I tweak the wording of the markers to some unique string
+(see package below) and then run =flush-lines= to remove them before
+saving the resulting buffer (so right after the =q=).  For more on this,
+check =me/ediff-flush-combination-pattern=.
+
+For =git= users, to actually /reference the common ancestor/ (the point
+before the branching paths started) we must run this command once in our
+command-line prompt (writes to your global =.gitconfig= file):
+
+#+begin_src
+git config --global merge.conflictStyle diff3
+#+end_src
+
+This is optional, but I find that I like it.  At any rate, the
+configurations I have below are straightforward (learn more about this
+powerful tool by hitting =?= inside of its control panel and by consulting
+its comprehensive manual):
+
++ Do not keep all the buffers after exiting the Ediff session.
++ Keep buffers in an editable state.  Otherwise it is impossible to
+  perform the changes we are interested in.
++ Show the common ancestor in another buffer.  This helps provide
+  further context of how things took their form.
++ Show only the conflicting parts.  This is not a review of all diffs.
++ Prefer putting windows side-by-side, rather than one below the other.
++ Do not enter the ediff session in a new frame.  This also means that
+  the control panel will be inside an Emacs window (at the bottom part)
+  rather than in a tiny frame of its own.
+
+There actually is not much in terms of Smerge-related configurations.
+The package is small and does one thing well.  I do, however, specify a
+hydra (as explained in [[#h:af691a31-917e-4d9b-aee6-5744b1173999][the relevant section]]) to make it easier to
+navigate conflicts.  Since =smerge-mode= only gets activated when visiting
+a file with diff conflicts, we can load the hydra upon accessing it.
+Makes things nice and simple.  No need to have a separate key binding.
+
+Also watch my video of [[https://protesilaos.com/codelog/2020-04-10-emacs-smerge-ediff/][Smerge and Ediff for git conflict resolution]]
+(2020-04-10).
+
+#+begin_src emacs-lisp
+(use-package smerge-mode
+  :config
+  (defhydra me/hydra-smerge-mode
+    (:color pink :hint nil :post (smerge-auto-leave))
+    "
+   ^Motions^      ^Actions^
+---^^-------------^^-------
+_n_: Next      _b_: Base
+_p_: Prev      _u_: Upper
+^^             _l_: Lower
+^^             _a_: All
+"
+    ("n" smerge-next)
+    ("p" smerge-prev)
+    ("b" smerge-keep-base)
+    ("u" smerge-keep-upper)
+    ("l" smerge-keep-lower)
+    ("a" smerge-keep-all)
+    ("q" nil "cancel" :color blue))
+
+  (defun me/smerge-mode-hydra ()
+    "Load `me/hydra-smerge-mode' in `smerge-mode'."
+    (when smerge-mode
+      (me/hydra-smerge-mode/body)))
+  :hook ((vc-find-file-hook . me/smerge-mode-hydra)
+         (magit-diff-visit-file-hook . me/smerge-mode-hydra)))
+
+(use-package ediff
+  :config
+  (setq ediff-keep-variants nil)
+  (setq ediff-make-buffers-readonly-at-startup nil)
+  (setq ediff-merge-revisions-with-ancestor t)
+  (setq ediff-show-clashes-only t)
+  (setq ediff-split-window-function 'split-window-horizontally)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+
+  ;; Tweak those for safer identification and removal
+  (setq ediff-combination-pattern
+        '("<<<<<<< prot-ediff-combine Variant A" A
+          ">>>>>>> prot-ediff-combine Variant B" B
+          "####### prot-ediff-combine Ancestor" Ancestor
+          "======= prot-ediff-combine End"))
+
+  ;; TODO automate process in a robust way, or at least offer a good key
+  ;; binding.
+  (defun me/ediff-flush-combination-pattern ()
+    "Remove my custom `ediff-combination-pattern' markers.
+
+This is a quick-and-dirty way to get rid of the markers that are
+left behind by `smerge-ediff' when combining the output of two
+diffs.  While this could be automated via a hook, I am not yet
+sure this is a good approach."
+    (interactive)
+    (flush-lines ".*prot-ediff.*" (point-min) (point-max) nil)))
+#+end_src
+
+** Proced (process monitor, similar to `top')
+:PROPERTIES:
+:CUSTOM_ID: h:6b56ce11-c84c-4b6d-98c7-bc3eefbe9325
+:END:
+
+This is a built-in tool that allows you to monitor running processes
+and act on them accordingly.  These are the basic settings I have
+right now.  Would need to experiment with it a bit more.  It works
+fine though.
+
+#+begin_src emacs-lisp
+(use-package proced
+  :commands proced
+  :config
+  (setq proced-auto-update-flag t)
+  (setq proced-auto-update-interval 1)
+  (setq proced-descend t)
+  (setq proced-filter 'user))
+#+end_src
+
+** Tools for manual pages (manpages)
+:PROPERTIES:
+:CUSTOM_ID: h:ce420306-c40c-4d9a-bc01-205c5e49a5d1
+:END:
+
+Emacs offers a couple of commands for reading manual pages: =man= and
+=woman=.  The former relies on the standard Unix tools, while the latter
+is an elisp implementation of the same idea.  As I only ever run a
+GNU/Linux system, I am okay with just =man=.
+
+Why bother?
+
++ All the goodies of consistency: fonts, themes, operating on text with
+  your familiar Emacs functionality, handling buffers…
++ Each manpage provides direct links to other items it references.
+
+What you can do inside such a buffer (with minor tweaks by me):
+
++ Hit =i= to go to the information node you want using completion (same
+  principle as with the Info pages of =C-h i= and the like).
++ =g= will generate the buffer anew.  Do it to reformat the text manually,
+  though this should also happen automatically when adjusting a window's
+  size.
++ =n= and =p= move between section headings.
++ Hit =RET= while over a referenced manpage to produce a new buffer with
+  its contents.
++ =s= takes you directly to the familiar "See Also" section.
++ Use =m= to search for another manpage using your completion framework.
+  If you invoke this command while point is over a referenced manpage,
+  it becomes the default choice (same concept as with common help
+  commands, =C-h f=, =C-h v=, and with many others like =find-library=).
+
+Need to filter out those =man= buffers?  Check [[#h:06290f9c-491c-45b2-b213-0248f890c83d][my Ibuffer entry]].
+
+While there are customisation options for this tool, I find the defaults
+to work as expected.  Note that the capitalisation of those symbols is
+canonical.
+
+#+begin_src emacs-lisp
+(use-package man
+  :bind (:map Man-mode-map
+              ("i" . Man-goto-section)
+              ("g" . Man-update-manpage)))
+#+end_src
+
+** Shells and terminal emulators
+:PROPERTIES:
+:CUSTOM_ID: h:0df1db3a-30ee-43e5-9086-92951a58164f
+:END:
+
+It should come to no surprise that Emacs can operate as both a /terminal
+emulator for command line shells/ and /toolkit for terminal emulators/.
+The present section covers both cases.
+
+*** Command-line shells
+:PROPERTIES:
+:CUSTOM_ID: h:2c1966a1-bf33-4fe3-ac45-9f31158efd9b
+:END:
+
+**** Shell (M-x shell)
+:PROPERTIES:
+:CUSTOM_ID: h:98804f0d-f2dd-41a4-b8df-c1bd04ef7f7a
+:END:
+
+This is a shell (Bash, in my case) that runs inside of Emacs.  Unlike
+the [[#h:91be4c80-d9ca-4628-8f4f-89bbbfeb32e2][terminal emulators defined below]], this one can use standard Emacs
+keys and behaves much like an ordinary buffer.  It also integrates
+nicely with the built-in completion tools, which makes it particularly
+nice to work with (start from [[#h:07e173ea-e7ed-4fc0-ba3c-e44b403359a7][Tools for completion candidate listing]]).
+
+The one area where this Shell differs substantially from ordinary
+buffers is with regard to the command prompt: you can re-run a command
+on the scroll-back buffer by just hitting =RET= while point is on its line
+(no need to go back to the end and cycle the command history with =M-p= or
+=M-n=).
+
+Another peculiarity relative to the standard commands in the terminal is
+to search backward through your history with =M-r= (whereas in a terminal
+emulator you use =C-r=).
+
+Run =C-h m= inside of a shell buffer to learn about all the key bindings
+and corresponding functions.
+
+#+begin_src emacs-lisp
+(use-package shell
+  :commands shell-command
+  :config
+  (setq ansi-color-for-comint-mode t)
+  (setq shell-command-prompt-show-cwd t) ; Emacs 27.1
+  :bind (("<s-S-return>" . shell)))
+#+end_src
+
+**** Eshell (like M-x shell but in elisp)
+:PROPERTIES:
+:CUSTOM_ID: h:103a8795-c29c-474f-9ddf-ecafaa2f6775
+:END:
+
+While I did read the =eshell= manual fairly early in my introduction to
+Emacs (July 2019), I failed to appreciate its added value.  Sure, you
+could run Elisp commands as well as those of the standard shells.  But
+that did not seem like an obvious step forward.  More of a lateral
+movement at best, for it was asking for a whole new way of thinking
+about the shell that could potentially complicate things in other areas.
+
+After gaining some experience with Emacs, I now (April 2020) have
+developed a newfound appreciation of Eshell's flexibility.  The fact
+that it can understand elisp means that you can develop entirely new
+modes of interaction that involve the command line and extend into other
+Emacs major modes.  For example, you can =cd= into a directory and then
+=dired= to access the full power of Emacs' /superb/ file manager (also check
+the [[#h:c519300f-8a9a-472b-b26d-c2f49adbdb5d][section on Dired]]).
+
+The core value of Eshell is that it behaves like an ordinary buffer.
+This means that we can build our own functions for moving around and
+operating on text.  =me/eshell-put-last-output-to-buffer= puts that in
+concrete terms.  The function will take the output of the last command
+and put it in a new buffer.  You can then select that buffer, edit it as
+you will and, say, =C-x C-w= to write it permanently to a file.
+
+Here is another case where integration with standard Emacs commands
+truly shines.  In Eshell, =cd= followed by the equals sign will produce a
+numbered list of the directories you have accessed.  With =cd -NUM= you
+can switch to the one you want.  So far so good, how about we also
+switch to a dired buffer from there?  Do it with =cd -NUM && dired=.
+
+Speaking of directories, =eshell-cd-on-directory= allows you to omit =cd=
+and just type in the path to a directory.  Awesome!  And while on the
+topic of Dired, you can use =dired-jump= to always switch to a =dired=
+buffer of the present working directory.  To that I add my own little
+utility (=me/eshell-file-parent-dir=) for jumping to the directory of
+the file at point: very useful in cases where you get files from
+different sources, such as with =find= (though do also check the various
+options for running =find= with =dired=, like =find-name-dired=).
+
+Extensibility is seamless.  =me/eshell-complete-history= offers a
+completion interface to the input history.  No need for awkard back and
+forth or for searching for a regexp without any immediate feedback.  In
+a similar fashion =me/eshell-complete-recent-dir= provides completion
+for switching directly to a recent directory.  While the more general
+=me/eshell-find-subdirectory-recursive= lets you switch to a
+subdirectory somewhere inside the path you are.
+
+Instead of outlining the remaining features of Eshell, *I strongly
+encourage you to read the manual*.  It is fairly short.  What I have here
+is just an early sample of what can be achieved with a few tweaks.
+
+Also check these valuable resources:
+
++ [[https://cestlaz.github.io/post/using-emacs-66-eshell-elisp][Mike Zamansky's video demo]] that also shows how to program an Eshell
+  switcher.
++ [[https://www.youtube.com/watch?v=RhYNu6i_uY4][Howard Abrahams' video]] that covers the features of Eshell.
++ [[https://ambrevar.xyz/emacs-eshell/][Pierre Neidhardt's detailed blog post]] on the pros and cons of Eshell.
+
+Finally, a few notes about contributions I have received:
+
++ [[https://gitlab.com/dije][Phil Hudson (@dije on Gitlab)]] explained how =concat= is superfluous when
+  combined with =format= and demonstrated how to use a specifier (=%s=) to
+  make a uniform string out of the output of some command combined with
+  predefined text.
+
++ Phil also helped me with =me/eshell-find-subdirectory-recursive= by
+  highlighting some inefficient routines in the original design.  This
+  inspired me to revisit the code and make it cleaner overall.  The gist
+  is that only the present working directory needs to be abbreviated.
+
++ Another user who preferred to remain anonymous sent me
+  =contrib/eshell-cat-with-syntax-highlight= which will apply syntax
+  highlighting to the output of a =cat= command.  The code I got was using
+  =define-advice=, so I tweaked it a bit to work with =advice-add= because I
+  find that syntax easier to follow.  I also made minor tweaks to the
+  docstring.
+
++ Same principle as above for =contrib/electrify-ls=.
+
++ Any errors are my own.
+
+#+begin_src emacs-lisp
+(use-package eshell
+  :bind ("<s-return>" . eshell))
+
+(use-package esh-mode
+  :commands me/eshell-minor-mode
+  :config
+  ;; used by other functions below
+  (declare-function ffap-file-at-point "ffap.el")
+
+  (defmacro me/eshell-ffap (name doc &rest body)
+    "Make commands for `eshell' find-file-at-point.
+NAME is how the function is called.  DOC is the function's
+documentation string.  BODY is the set of arguments passed to the
+`if' statement to be evaluated when a file at point is present."
+    `(defun ,name ()
+       ,doc
+       (interactive)
+       (let ((file (ffap-file-at-point)))
+         (if file
+             ,@body
+           (user-error "No file at point")))))
+
+  (me/eshell-ffap
+   me/eshell-insert-file-at-point
+   "Insert (cat) contents of file at point."
+   (progn
+     (goto-char (point-max))
+     (insert (concat "cat " file))
+     (eshell-send-input)))
+
+  (me/eshell-ffap
+   me/eshell-kill-save-file-at-point
+   "Add to kill-ring the absolute path of file at point."
+   (progn
+     (kill-new (concat (eshell/pwd) "/" file))
+     (message "Copied full path of %s" file)))
+
+  (me/eshell-ffap
+   me/eshell-find-file-at-point
+   "Run `find-file' for file at point (ordinary file or dir).
+Recall that this will produce a `dired' buffer if the file is a
+directory."
+   (find-file file))
+
+  (me/eshell-ffap
+   me/eshell-file-parent-dir
+   "Open `dired' with the parent directory of file at point."
+   (dired (file-name-directory file)))
+
+  (defun me/eshell-put-last-output-to-buffer ()
+    "Produce a buffer with output of last `eshell' command."
+    (interactive)
+    (let ((eshell-output (buffer-substring-no-properties
+                          (eshell-beginning-of-output)
+                          (eshell-end-of-output))))
+      (with-current-buffer (get-buffer-create "*last-eshell-output*")
+        (erase-buffer)
+        (insert eshell-output)
+        (switch-to-buffer-other-window (current-buffer)))))
+
+  (defun me/eshell-complete-redirect-to-buffer ()
+    "Complete the syntax for appending to a buffer via `eshell'."
+    (interactive)
+    (insert
+     (format " >>> #<%s>"
+             (read-buffer-to-switch "Switch to buffer: "))))
+
+  (defun me/eshell-narrow-output-highlight-regexp ()
+    (interactive)
+    (let ((regexp (read-regexp "Regexp to highlight")))
+      (narrow-to-region (eshell-beginning-of-output)
+                        (eshell-end-of-output))
+      (goto-char (point-min))
+      (highlight-regexp regexp 'hi-yellow)))
+
+  ;;;; NOTE by Prot 2020-06-16: the following two advice-add snippets
+  ;;;; will need to be reviewed to make sure they do not produce
+  ;;;; undesirable side effects.
+
+  ;; syntax highlighting implementation modified from
+  ;; https://emacs.stackexchange.com/questions/50385/use-emacs-syntax-coloring-when-not-in-emacs
+  ;;
+  ;; This command also makes it possible to, e.g., cat an encrypted and/or
+  ;; compressed file.
+  (defun contrib/eshell-cat-with-syntax-highlight (&rest args)
+    "Like `eshell/cat' but with syntax highlighting.
+To be used as `:override' advice to `eshell/cat'."
+    (setq args (eshell-stringify-list (flatten-tree args)))
+    (dolist (filename args)
+      (let ((existing-buffer (get-file-buffer filename))
+            (buffer (find-file-noselect filename)))
+        (eshell-print
+         (with-current-buffer buffer
+           (if (fboundp 'font-lock-ensure)
+               (font-lock-ensure)
+             (with-no-warnings
+               (font-lock-fontify-buffer)))
+           (let ((contents (buffer-string)))
+             (remove-text-properties 0 (length contents) '(read-only nil) contents)
+             contents)))
+        (unless existing-buffer
+          (kill-buffer buffer)))))
+
+  (advice-add 'eshell/cat :override #'contrib/eshell-cat-with-syntax-highlight)
+
+  ;; Turn ls results into clickable links.  Especially useful when
+  ;; combined with link-hint.  Modified from
+  ;; https://www.emacswiki.org/emacs/EshellEnhancedLS
+  (define-button-type 'eshell-ls
+    'supertype 'button
+    'help-echo "RET, mouse-2: visit this file"
+    'follow-link t)
+
+  (defun contrib/electrify-ls (name)
+    "Buttonise `eshell' ls file names.
+Visit them with RET or mouse click.  This function is meant to be
+used as `:filter-return' advice to `eshell-ls-decorated-name'."
+    (add-text-properties 0 (length name)
+                         (list 'button t
+                               'keymap button-map
+                               'mouse-face 'highlight
+                               'evaporate t
+                               'action #'find-file
+                               'button-data (expand-file-name name)
+                               'category 'eshell-ls)
+                         name)
+    name)
+
+  (advice-add 'eshell-ls-decorated-name :filter-return #'contrib/electrify-ls)
+  :bind (:map eshell-mode-map
+              ("M-k" . eshell-kill-input)
+              ("C-c i" . me/eshell-insert-file-at-point)
+              ("C-c f" . me/eshell-find-file-at-point)
+              ("C-c C-f" . me/eshell-find-file-at-point)
+              ("C-c o" . me/eshell-put-last-output-to-buffer)
+              ("C-c w" . me/eshell-kill-save-file-at-point)
+              ("C-c >" . me/eshell-complete-redirect-to-buffer)
+              ("C-c C-j" . me/eshell-file-parent-dir)
+              ("C-c h" . me/eshell-narrow-output-highlight-regexp)
+              ("C-c =" . me/eshell-complete-recent-dir)))
+
+(use-package esh-module
+  :config
+  (setq eshell-modules-list             ; Needs review
+        '(eshell-alias
+          eshell-basic
+          eshell-cmpl
+          eshell-dirs
+          eshell-glob
+          eshell-hist
+          eshell-ls
+          eshell-pred
+          eshell-prompt
+          eshell-script
+          eshell-term
+          eshell-tramp
+          eshell-unix)))
+
+(use-package em-dirs
+  :after esh-mode
+  :config
+  (setq eshell-cd-on-directory t))
+
+(use-package em-tramp
+  :after esh-mode
+  :config
+  (setq password-cache t)
+  (setq password-cache-expiry 600))
+
+(use-package em-hist
+  :after esh-mode
+  :config
+  (setq eshell-hist-ignoredups t)
+  (setq eshell-save-history-on-exit t)
+
+  (defun me/eshell-complete-history ()
+    "Insert element from `eshell' history using completion."
+    (interactive)
+    (let ((hist (ring-elements eshell-history-ring)))
+      (insert
+       (completing-read "Input history: " hist nil t))))
+
+  (defun me/eshell-complete-recent-dir (&optional arg)
+    "Switch to a recent `eshell' directory using completion.
+With \\[universal-argument] also open the directory in a `dired'
+buffer."
+    (interactive "P")
+    (let* ((dirs (ring-elements eshell-last-dir-ring))
+           (dir (completing-read "Switch to recent dir: " dirs nil t)))
+      (insert dir)
+      (eshell-send-input)
+      (when arg
+        (dired dir))))
+
+  ;; `cl-remove-if' is used right below
+  (declare-function cl-remove-if "cl-seq")
+
+  (defun me/eshell-find-subdirectory-recursive ()
+    "Recursive `eshell/cd' to subdirectory.
+This command has the potential for infinite recursion: use it
+wisely or prepare to use `eshell-interrupt-process'."
+    (interactive)
+    (let* ((dir (abbreviate-file-name (eshell/pwd)))
+           (contents (directory-files-recursively dir ".*" t nil nil))
+           (dirs (cl-remove-if-not (lambda (x)
+                                     (or (file-directory-p x)
+                                         (string-match-p "\\.git" x)))
+                                   contents))
+           (selection (completing-read
+                       (format "Find sub-dir from %s (%s): "
+                               (propertize dir 'face 'success)
+                               (length dirs))
+                       dirs nil t)))
+      (insert selection)
+      (eshell-send-input)))
+
+  :bind (:map eshell-hist-mode-map
+              ("M-s" . nil) ; I use this for lots of more useful commands
+              ("M-r" . me/eshell-complete-history) ; use this to find input history
+              ("C-c d" . me/eshell-find-subdirectory-recursive)))
+#+end_src
+
+*** Terminals inside of Emacs
+:PROPERTIES:
+:CUSTOM_ID: h:91be4c80-d9ca-4628-8f4f-89bbbfeb32e2
+:END:
+
+**** Built-in terminals (fallback option)
+:PROPERTIES:
+:CUSTOM_ID: h:87b40f59-0e11-48bc-8120-40026ebaf8a4
+:END:
+
+=term= and =ansi-term= are built-in /terminal emulators/ [[#h:91be4c80-d9ca-4628-8f4f-89bbbfeb32e2][like Vterm]].  Not to
+be confused with the [[#h:2c1966a1-bf33-4fe3-ac45-9f31158efd9b][command line shells]].  They run inside of Emacs but
+are basically alien to the rest of the Emacs milieu: they do not reuse
+standard key bindings like =C-n=.
+
+*Only call those if you absolutely need them AND you have no access to
+either Vterm or a standalone, fully fledged terminal emulator*.
+
+As far as I can tell, based on reading the comments in =term.el= and
+elsewhere in the docs, the major difference between =term= and
+=ansi-term= is the ability of the latter to run one or multiple buffers
+simultaneously.  Better check the documentation for this point.  It does
+not seem to be a strong point, since this is also possible with the
+other options in the Emacs space (e.g. with =C-u M-x shell=).
+
+#+begin_src emacs-lisp
+(use-package term
+  :commands (term ansi-term)
+  :config
+  (setq term-buffer-maximum-size 9999)
+  (setq term-completion-autolist t)
+  (setq term-completion-recexact t)
+  (setq term-scroll-to-bottom-on-output nil))
 #+end_src
 
 * General interface and interactions
   :PROPERTIES:
   :CUSTOM_ID: h:b6bd2eea-8269-4029-b446-ee340c12ebc3
   :END:
-
-
-** Language settings for prose and code
-   :PROPERTIES:
-   :CUSTOM_ID: h:8fc1f9ca-f5ae-407a-b721-aab414ca657b
-   :END:
-
-*** Line numbers
-#+BEGIN_SRC emacs-lisp
-  (use-package emacs
-    :hook (prog-mode . display-line-numbers-mode)
-    :config
-    (setq-default display-line-numbers-width 4
-		  display-line-numbers-widen t))
-#+END_SRC
-*** Configure 'electric' behaviour
-Emacs labels as “electric” any behaviour that involves contextual
-  auto-insertion of characters.  This is a summary of my settings:
-
-  Indent automatically.
-  If electric-pair-mode is enabled (which I might do manually), insert
-    quotes and brackets in pairs.  Only do so if there is no alphabetic
-    character after the cursor.
-  The cryptic numbers in the pairs set, correspond to curly single and
-    double quotes and these «».  The contents of this set are always
-    inserted in pairs, regardless of major mode.
-
-      To get those numbers, evaluate (string-to-char CHAR) where CHAR is
-        the one you are interested in.  For example, get the literal tab’s
-        character with (string-to-char "\t").
-
-
-  While inputting a pair, inserting the closing character will just skip
-    over the existing one, rather than add a new one.  So typing ( will
-    insert () and then typing ) will just be the same as moving forward
-    one character C-f.
-  Do not skip over whitespace when operating on pairs.  Combined with
-    the above point, this means that a new character will be inserted,
-    rather than be skipped over.  I find this better, because it prevents
-    the point from jumping forward, plus it allows for more natural
-    editing.
-  The whitespace characters are space (\s), tab (\t), and newline (\n).
-  The rest concern the conditions for transforming quotes into their
-    curly equivalents.  I keep this disabled, because curly quotes are
-    distinct characters.  It is difficult to search for them.  Just note
-    that on GNU/Linux you can type them directly by hitting the “compose”
-    key and then an angled bracket (< or >) followed by a quote mark.
-
-#+BEGIN_SRC emacs-lisp
-(use-package electric
-  :config
-  (setq electric-pair-inhibit-predicate'electric-pair-conservative-inhibit)
-  (setq electric-pair-preserve-balance t)
-  (setq electric-pair-pairs
-        '((8216 . 8217)
-          (8220 . 8221)
-          (171 . 187)))
-  (setq electric-pair-skip-self 'electric-pair-default-skip-self)
-  (setq electric-pair-skip-whitespace nil)
-  (setq electric-pair-skip-whitespace-chars
-        '(9
-          10
-          32))
-  (setq electric-quote-context-sensitive t)
-  (setq electric-quote-paragraph t)
-  (setq electric-quote-string nil)
-  (setq electric-quote-replace-double t)
-  :hook (after-init-hook . (lambda ()
-                             (electric-indent-mode 1)
-                             (electric-pair-mode -1)
-                             (electric-quote-mode -1))))
-#+END_SRC
-
-*** Parentheses
-Configure the mode that highlights matching delimiters or parentheses.
-  I consider this of utmost importance when working with languages such as
-  elisp.
-Summary of what these do:
-
-  Activate the mode.
-  Show the matching delimiter/parenthesis if on screen, else show
-    nothing.  It is possible to highlight the expression enclosed by the
-    delimiters, by using either mixed or expression.  The latter always
-    highlights the entire balanced expression, while the former will only
-    do so if the matching delimiter is off screen.
-  Highlight parentheses even if the point is in their vicinity.  This
-    means the beginning or end of the line, with space in between.
-  Do not highlight a match when the point is on the inside of the
-    parenthesis.
-#+BEGIN_SRC emacs-lisp
-(use-package paren
-  :config
-  (setq show-paren-style 'parenthesis)
-  (setq show-paren-when-point-in-periphery t)
-  (setq show-paren-when-point-inside-paren nil)
-  :hook (after-init-hook . show-paren-mode))
-#+END_SRC
-
-*** Flymake
-#+BEGIN_SRC emacs-lisp
-(use-package flymake
-    :config
-    (define-key flymake-mode-map (kbd "C-c ! l") 'flymake-show-diagnostics-buffer)
-    (remove-hook 'flymake-diagnostic-functions 'flymake-proc-legacy-flymake)
-    :hook (js-mode . flymake-mode)
-)
-#+END_SRC
-*** Lsp mode
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :ensure t
-    :hook ((js-mode . lsp)
-	   (java-mode . lsp)
-	   (python-mode . lsp))
-    :commands lsp
-    :config
-    (setq lsp-prefer-capf t
-          lsp-pyls-plugins-flake8-enabled t
-	  lsp-idle-delay 0.500
-	  lsp-enable-snippet nil
-	  lsp-auto-guess-root nil))
-
-  (use-package lsp-java
-    :ensure t
-    :hook (java-mode . lsp))
-
-#+END_SRC
-*** treemacs
-#+BEGIN_SRC emacs-lisp
-  (use-package treemacs
-    :ensure t
-    :defer t
-    :init
-    (with-eval-after-load 'winum
-      (define-key winum-keymap (kbd "M-0") #'treemacs-select-window))
-    :config
-    (progn
-      (setq treemacs-collapse-dirs                 (if treemacs-python-executable 3 0)
-	    treemacs-deferred-git-apply-delay      0.5
-	    treemacs-directory-name-transformer    #'identity
-	    treemacs-display-in-side-window        t
-	    treemacs-eldoc-display                 t
-	    treemacs-file-event-delay              5000
-	    treemacs-file-extension-regex          treemacs-last-period-regex-value
-	    treemacs-file-follow-delay             0.2
-	    treemacs-file-name-transformer         #'identity
-	    treemacs-follow-after-init             t
-	    treemacs-git-command-pipe              ""
-	    treemacs-goto-tag-strategy             'refetch-index
-	    treemacs-indentation                   2
-	    treemacs-indentation-string            " "
-	    treemacs-is-never-other-window         nil
-	    treemacs-max-git-entries               5000
-	    treemacs-missing-project-action        'ask
-	    treemacs-move-forward-on-expand        nil
-	    treemacs-no-png-images                 nil
-	    treemacs-no-delete-other-windows       t
-	    treemacs-project-follow-cleanup        nil
-	    treemacs-persist-file                  (expand-file-name ".cache/treemacs-persist" user-emacs-directory)
-	    treemacs-position                      'left
-	    treemacs-recenter-distance             0.1
-	    treemacs-recenter-after-file-follow    nil
-	    treemacs-recenter-after-tag-follow     nil
-	    treemacs-recenter-after-project-jump   'always
-	    treemacs-recenter-after-project-expand 'on-distance
-	    treemacs-show-cursor                   nil
-	    treemacs-show-hidden-files             t
-	    treemacs-silent-filewatch              nil
-	    treemacs-silent-refresh                nil
-	    treemacs-sorting                       'alphabetic-asc
-	    treemacs-space-between-root-nodes      t
-	    treemacs-tag-follow-cleanup            t
-	    treemacs-tag-follow-delay              1.5
-	    treemacs-user-mode-line-format         nil
-	    treemacs-user-header-line-format       nil
-	    treemacs-width                         45)
-
-      ;; The default width and height of the icons is 22 pixels. If you are
-      ;; using a Hi-DPI display, uncomment this to double the icon size.
-      (treemacs-resize-icons 19)
-
-      (treemacs-follow-mode -1)
-      (treemacs-filewatch-mode t)
-      (treemacs-fringe-indicator-mode t)
-      (pcase (cons (not (null (executable-find "git")))
-		   (not (null treemacs-python-executable)))
-	(`(t . t)
-	 (treemacs-git-mode 'deferred))
-	(`(t . _)
-	 (treemacs-git-mode 'simple))))
-    :bind
-    (:map global-map
-	  ("M-0"       . treemacs-select-window)
-	  ("C-x t 1"   . treemacs-delete-other-windows)
-	  ("C-x t t"   . treemacs)
-	  ("C-x t B"   . treemacs-bookmark)
-	  ("C-x t C-t" . treemacs-find-file)
-	  ("C-x t M-t" . treemacs-find-tag)))
-
-  (use-package treemacs-icons-dired
-    :after treemacs dired
-    :ensure t
-    :config (treemacs-icons-dired-mode))
-#+END_SRC
-*** html
-
-#+BEGIN_SRC emacs-lisp
-
-  ;; TODO Move this to other location in file
-  (use-package emacs
-    :config
-    (defun tag-word-or-region (tag)
-      "Surround current word or region with a given tag."
-      (interactive "sEnter tag (without <>): ")
-      (let (pos1 pos2 bds start-tag end-tag)
-	(setq start-tag (concat "<" tag ">"))
-	(setq end-tag (concat "</" tag ">"))
-	(if (and transient-mark-mode mark-active)
-	    (progn
-	      (goto-char (region-end))
-	      (insert end-tag)
-	      (goto-char (region-beginning))
-	      (insert start-tag))
-	  (progn
-	    (setq bds (bounds-of-thing-at-point 'symbol))
-	    (goto-char (cdr bds))
-	    (insert end-tag)
-	    (goto-char (car bds))
-	    (insert start-tag))))))
-#+END_SRC
-*** JavaScript
-#+BEGIN_SRC emacs-lisp
-  (use-package js
-    :ensure nil
-    :defer t
-    :custom
-    (js-indent-level 2))
-
-  (use-package flymake-eslint
-    :ensure
-    :config
-    (add-hook 'js-mode-hook
-	      (lambda ()
-		(flymake-eslint-enable))))
-#+END_SRC
-
-
-**** Prettier
-
-#+BEGIN_SRC emacs-lisp
-  (use-package add-node-modules-path
-    :ensure t
-    :hook (js-mode . add-node-modules-path))
-
-  (use-package prettier-js
-    :ensure t
-    :hook (js-mode . prettier-js-mode))
-
-#+END_SRC
-
-*** Python
-
-#+BEGIN_SRC emacs-lisp
-(use-package python
-  :ensure nil
-  :hook (python-mode . turn-on-prettify-symbols-mode))
-
-#+END_SRC
-*** Clojure
-
-#+BEGIN_SRC emacs-lisp
-(use-package cider
-  :ensure t
-  :defer t
-  :config
-  ;; REPL related stuff
-
-  ;; REPL history file
-  (setq cider-repl-history-file "~/.emacs.d/cider-history")
-
-  ;; nice pretty printing
-  (setq cider-repl-use-pretty-printing t)
-
-  ;; nicer font lock in REPL
-  (setq cider-repl-use-clojure-font-lock t)
-
-  ;; result prefix for the REPL
-  (setq cider-repl-result-prefix ";; => ")
-
-  ;; never ending REPL history
-  (setq cider-repl-wrap-history t)
-
-  ;; looong history
-  (setq cider-repl-history-size 3000)
-
-  ;; eldoc for clojure
-  (add-hook 'cider-mode-hook #'eldoc-mode)
-
-
-  ;; error buffer not popping up
-  (setq cider-show-error-buffer nil))
-
-#+END_SRC
-
-** Custom movements and motions
-   :PROPERTIES:
-   :CUSTOM_ID: h:9aa933d2-70a9-426a-aeb2-2fa21bc67d97
-   :END:
-
-*** Collection of unpackaged commands or tweaks
-    :PROPERTIES:
-    :CUSTOM_ID: h:2442f3bf-3ffb-431d-82d9-8a44954355b1
-    :END:
-
-#+begin_src emacs-lisp
-  (use-package emacs
-    :config
-    (defun me/show-kill-ring ()
-      "Insert all `kill-ring' content in a new buffer named *copy history*."
-      (interactive)
-      (let (($buf (generate-new-buffer "*copy history*")))
-	(progn
-	  (switch-to-buffer $buf)
-	  (funcall 'fundamental-mode)
-	  (dolist (x kill-ring )
-	    (insert x "\n\n================================================================================\n\n"))
-	  (goto-char (point-min)))))
-
-    (defun shell-command-on-buffer (command)
-      "run a command on the current file and revert the buffer"
-      (interactive "sCommand:")
-      (shell-command
-       (format "%s %s"
-	       command
-	       (shell-quote-argument (buffer-file-name))))
-      (revert-buffer t t t))
-
-    (defun me/copy-line ()
-      "Copies the entirety of the current line."
-      (interactive)
-      (copy-region-as-kill (point-at-bol) (point-at-eol))
-      (message "Current line copied"))
-
-    (defun me/delete-pair-backward ()
-      "Delete pair of characters before point.
-
-  Use the character right before point as a reference on what to
-  match for deletion."
-      (interactive)
-      (delete-pair -1))
-
-    (defun me/insert-double-quotes (&optional arg)
-      "Insert a pair of double quotes or wrap ARG with them."
-      (interactive "P")
-      (insert-pair arg ?\" ?\"))
-
-    (defun me/insert-double-smart-quotes (&optional arg)
-      "Insert a pair of double smart quotes or wrap ARG with them."
-      (interactive "P")
-      (insert-pair arg ?\“ ?\”))
-
-    (defun me/insert-single-smart-quotes (&optional arg)
-      "Insert a pair of single smart quotes or wrap ARG with them."
-      (interactive "P")
-      (insert-pair arg ?\‘ ?\’))
-
-    (defun me/insert-elisp-quotes (&optional arg)
-      "Insert a pair of elisp symbol quotes or wrap ARG with them."
-      (interactive "P")
-      (insert-pair arg ?\` ?\'))
-
-    (defun me/multi-line-next ()
-      "Moves point 15 lines down."
-      (interactive)
-      (forward-line 15))
-
-    (defun me/multi-line-prev ()
-      "Moves point 15 lines up."
-      (interactive)
-      (forward-line -15))
-
-    (defun me/kill-line-backward ()
-      "Kill from point to the beginning of the line."
-      (interactive)
-      (kill-line 0))
-
-    (defun me/new-line-below ()
-      "Create a new line below the current one.  Move the point to
-  the absolute beginning.  Also see `me/new-line-above'."
-      (interactive)
-      (end-of-line)
-      (newline))
-
-    (defun me/new-line-above ()
-      "Create a new line above the current one.  Move the point to
-  the absolute beginning.  Also see `me/new-line-below'."
-      (interactive)
-      (beginning-of-line)
-      (newline)
-      (forward-line -1))
-
-    (defun contrib/rename-file-and-buffer ()
-      "Rename current buffer and if the buffer is visiting a file, rename it too."
-      (interactive)
-      (let ((filename (buffer-file-name)))
-	(if (not (and filename (file-exists-p filename)))
-	    (rename-buffer (read-from-minibuffer "New name: " (buffer-name)))
-	  (let* ((new-name (read-from-minibuffer "New name: " filename))
-		 (containing-dir (file-name-directory new-name)))
-	    (make-directory containing-dir t)
-	    (cond
-	     ((vc-backend filename) (vc-rename-file filename new-name))
-	     (t
-	      (rename-file filename new-name t)
-	      (set-visited-file-name new-name t t)))))))
-
-    (defun me/transpose-chars ()
-      "Always transposes the two characters before point.  There is
-  no 'dragging' the character forward.  This is the behaviour of
-  `transpose-chars' when point is at end-of-line."
-      (interactive)
-      (transpose-chars -1)
-      (forward-char))
-
-    (defun me/transpose-or-swap-lines (arg)
-      "If region is active, swap the line at mark (region
-  beginning) with the one at point (region end).  This leverages a
-  facet of the built-in `transpose-lines'.  Otherwise transpose the
-  current line with the one before it ('drag' line downward)."
-      (interactive "p")
-      (if (use-region-p)
-	  (transpose-lines 0)
-	(transpose-lines arg)))
-
-    (defun me/transpose-or-swap-paragraphs (arg)
-      "If region is active, swap the paragraph at mark (region
-  beginning) with the one at point (region end).  This leverages a
-  facet of the built-in `transpose-paragraphs'.  Otherwise
-  transpose the current paragraph with the one after it ('drag'
-  paragraph downward)."
-      (interactive "p")
-      (if (use-region-p)
-	  (transpose-paragraphs 0)
-	(transpose-paragraphs arg)))
-
-    (defun me/transpose-or-swap-sentences (arg)
-      "If region is active, swap the sentence at mark (region
-  beginning) with the one at point (region end).  This leverages a
-  facet of the built-in `transpose-sentences'.  Otherwise transpose
-  the sentence before point with the one after it ('drag' sentence
-  forward/downward).  Also `fill-paragraph' afterwards.
-
-  Note that, by default, sentences are demarcated by two spaces."
-      (interactive "p")
-      (if (use-region-p)
-	  (transpose-sentences 0)
-	(transpose-sentences arg))
-      (fill-paragraph))
-
-    (defun me/transpose-or-swap-words (arg)
-      "If region is active, swap the word at mark (region
-  beginning) with the one at point (region end).
-
-  Otherwise, and while inside a sentence, this behaves as the
-  built-in `transpose-words', dragging forward the word behind the
-  point.  The difference lies in its behaviour at the end of a
-  line, where it will always transpose the word at point with the
-  one behind it (effectively the last two words).
-
-  This addresses two patterns of behaviour I dislike in the
-  original command:
-
-  1. When a line follows, `M-t' will transpose the last word of the
-  line at point with the first word of the line below.
-
-  2. While at the end of the line, `M-t' will not transpose the
-  last two words, but will instead move point one word backward.
-  To actually transpose the last two words, you need to invoke the
-  command twice."
-      (interactive "p")
-      (if (use-region-p)
-	  (transpose-words 0)
-	(if (eq (point) (point-at-eol))
-	    (progn
-	      (backward-word 1)
-	      (transpose-words 1)
-	      (forward-char 1))
-	  (transpose-words arg))))
-
-    (defun me/unfill-region-or-paragraph (&optional region)
-      "Join all lines in a region, if active, while respecting any
-  empty lines (so multiple paragraphs are not joined, just
-  unfilled).  If no region is active, operate on the paragraph.
-  The idea is to produce the opposite effect of both
-  `fill-paragraph' and `fill-region'."
-      (interactive)
-      (let ((fill-column most-positive-fixnum))
-	(if (use-region-p)
-	    (fill-region (region-beginning) (region-end))
-	  (fill-paragraph nil region))))
-
-    (defun me/yank-replace-line-or-region ()
-      "Replace the line at point with the contents of the last
-  stretch of killed text.  If the region is active, operate over it
-  instead.  This command can then be followed by the standard
-  `yank-pop' (default is bound to M-y)."
-      (interactive)
-      (if (use-region-p)
-	  (progn
-	    (delete-region (region-beginning) (region-end))
-	    (yank))
-	(delete-region (point-at-bol) (point-at-eol))
-	(yank)))
-    (defun my-delete-word (arg)
-      "Delete characters forward until encountering the end of a word.
-  With argument, do this that many times.
-  This command does not push erased text to kill-ring."
-      (interactive "p")
-      (delete-region (point) (progn (forward-word arg) (point))))
-
-    (defun my-backward-delete-word (arg)
-      "Delete characters backward until encountering the beginning of a word.
-  With argument, do this that many times.
-  This command does not push erased text to kill-ring."
-      (interactive "p")
-      (my-delete-word (- arg)))
-
-
-    :bind (("<C-f2>" . contrib/rename-file-and-buffer)
-	   ("C-S-w" . me/copy-line)
-	   ("M-=" . count-words)
-	   ("<C-delete>" . delete-pair)
-	   ("<C-backspace>" . me/delete-pair-backward)
-	   ("M-\"" . me/insert-double-quotes)
-	   ("C-M-\"" . me/insert-double-smart-quotes)
-	   ("C-M-'" . me/insert-single-smart-quotes)
-	   ("M-`" . me/insert-elisp-quotes)
-	   ("s-k" . kill-this-buffer)
-	   ("M-k" . me/kill-line-backward)
-	   ("C-S-n" . me/multi-line-next)
-	   ("C-S-p" . me/multi-line-prev)
-	   ("<C-return>" . me/new-line-below)
-	   ("<C-S-return>" . me/new-line-above)
-	   ("M-SPC" . cycle-spacing)
-	   ("M-o" . delete-blank-lines)
-	   ("C-t" . me/transpose-chars)
-	   ("C-x C-t" . me/transpose-or-swap-lines)
-	   ("C-S-t" . me/transpose-or-swap-paragraphs)
-	   ("C-x M-t" . me/transpose-or-swap-sentences)
-	   ("M-t" . me/transpose-or-swap-words)
-	   ("M-Q" . me/unfill-region-or-paragraph)
-	   ("C-S-y" . me/yank-replace-line-or-region)
-	   ("M-d" . my-delete-word)
-	   ("M-<backspace>" . my-backward-delete-word)))
-#+end_src
-
-*** Move lines and faster navigation
-#+BEGIN_SRC emacs-lisp
-(use-package emacs
-  :config
-
-  (defun move-line-up ()
-    (interactive)
-    (transpose-lines 1)
-    (forward-line -2))
-
-  (defun move-line-down ()
-    (interactive)
-    (forward-line 1)
-    (transpose-lines 1)
-    (forward-line -1))
-
-  (bind-keys ("M-S-<up>" . move-line-up)
-             ("M-S-<down>" . move-line-down)))
-#+END_SRC
-
-*** Global keys definitions
-#+BEGIN_SRC emacs-lisp
-  (use-package emacs
-  :config
-    (define-key global-map (kbd "RET") 'newline-and-indent)
-
-    (global-set-key "\C-cy" '(lambda ()
-			       (interactive)
-			       (popup-menu 'yank-menu))))
-#+END_SRC
 ** Cursor and mouse settings
    :PROPERTIES:
    :CUSTOM_ID: h:a75d07c3-22a8-4e0f-aa88-1e2e1579d820
@@ -1600,10 +2821,65 @@ recenter text, because of the above.
 *Pro tip*: On Emacs 27.1 you can create a rectangular region by holding
 down Ctrl and Meta while dragging the mouse with the left click pressed.
 
-*** Tool tips
-    :PROPERTIES:
-    :CUSTOM_ID: h:9f492949-70fb-4fba-a0ea-569d4a240be8
-    :END:
+*** Multiple cursors (edit in several parts at once)
+:PROPERTIES:
+:CUSTOM_ID: h:397728fd-e437-470a-a571-d03954106b9a
+:END:
+
+The =multiple-cursors= package offers a comprehensive list of commands to
+edit text in several points of the screen at once.  Though I normally
+rely on keyboard macros and =query-replace= to perform complex edits in
+numerous parts of a buffer or set thereof, it sometimes is easier to
+just pop a few extra cursors and type directly, especially for quick,
+one-time operations.
+
+For the technically minded, make sure to read Christopher Wellons'
+article on [[https://nullprogram.com/blog/2017/09/07/][Gap Buffers Are Not Optimized for Multiple Cursors]].  Also
+quoting from the source code (=M-x find-library multiple-cursors=):
+
+#+begin_quote
+Known limitations
+
++ isearch-forward and isearch-backward aren't supported with multiple cursors.
+  You should feel free to add a simplified version that can work with it.
++ Commands run with `M-x` won't be repeated for all cursors.
++ All key bindings that refer to lambdas are always run for all cursors. If you
+  need to limit it, you will have to give it a name.
++ Redo might screw with your cursors. Undo works very well.
+#+end_quote
+
+So learn keyboard macros and =query-replace= and let this package handle
+more straightforward workflows.
+
+#+begin_src emacs-lisp
+(use-package multiple-cursors
+  :ensure
+  :bind (("C-<" . mc/mark-previous-like-this)
+         ("C->" . mc/mark-next-like-this)
+         ("s->" . mc/mark-all-like-this)))
+#+end_src
+*** Delete selection
+:PROPERTIES:
+:CUSTOM_ID: h:d53b7b54-924a-443b-955a-3c5b222e3a90
+:END:
+
+This is a very helpful mode.  It kills the marked region when inserting
+directly to it.  It also has checks to ensure that yanking over a
+selected region will not insert itself when =mouse-drag-copy-region= is in
+effect (see the section on the [[#h:02572210-eb26-4941-8f7c-666a0314877b][mouse wheel behaviour]]).
+
+#+begin_src emacs-lisp
+(use-package delsel
+  :hook (after-init-hook . delete-selection-mode))
+#+end_src
+
+*Pro tip*: On Emacs 27.1 or higher you can create a rectangular region by
+holding down Ctrl and Meta while dragging the mouse with the left click
+pressed.
+*** Tooltips (tooltip-mode)
+:PROPERTIES:
+:CUSTOM_ID: h:9f492949-70fb-4fba-a0ea-569d4a240be8
+:END:
 
 These settings control how tool tips are to be handled when hovering the
 mouse over an actionable item:
@@ -1619,13 +2895,169 @@ mouse over an actionable item:
   (setq tooltip-delay 0.5)
   (setq tooltip-short-delay 0.5)
   (setq x-gtk-use-system-tooltips nil)
-  :hook (after-init . tooltip-mode))
+  (setq tooltip-frame-parameters
+        '((name . "tooltip")
+          (internal-border-width . 6)
+          (border-width . 0)
+          (no-special-glyphs . t)))
+  :hook (after-init-hook . tooltip-mode))
+#+end_src
+
+** Registers
+:PROPERTIES:
+:CUSTOM_ID: h:6bdfe4d1-f97a-4d89-ab68-e87448a95fea
+:END:
+
+Registers are compartments that hold data of various sorts.  They offer
+the means for advanced, highly efficient workflows, especially when
+combined with keyboard macros.
+
+Registers are called by a single character, which can be a letter
+(case-sensitive), number, or symbol.  Each character can only contain a
+single register at a time.
+
+To define a register, you call the appropriate command (see table below)
+and then specify the character you want to store that data at.
+
+| Key chord | Command                                               |
+|-----------+-------------------------------------------------------|
+| C-x r n   | number-to-register                                    |
+| C-x r s   | copy-to-register (think "save string")                |
+| C-x r r   | copy-rectangle-to-register                            |
+| C-x r SPC | point-to-register                                     |
+| C-x r w   | window-configuration-to-register                      |
+| C-x r f   | frameset-to-register (frames and their windows)       |
+| C-x r +   | increment-register (better used with numbers)         |
+| C-x r i   | insert-register (text, number, rectangle)             |
+| C-x r j   | jump-to-register (to point or window/frameset config) |
+
+Notes about some of the above:
+
++ Using =point-to-register= allows you to revisit a specific location in a
+  buffer, but also reopen the file visited by that buffer in case the
+  buffer is deleted.
++ Calling =number-to-register= without an argument will just store the
+  number =0= to the register you specify.  Whereas =C-u 100 C-x r n= will
+  store =100=.  In practice, you often want to use the latter method.
++ Use =increment-register= to increment a number by one.  Pass a numeric
+  argument to increment by that amount instead.  For example, to
+  increment by five do =C-u 5 C-x r += and then select the register you
+  want to operate on.  This only affects the value stored in the
+  register.  It does not also insert it in the buffer.
++ Number registers are particularly useful when you want to increment
+  several numbers through a keyboard macro.  You can record the motions
+  you need, run =increment-register= as noted above followed by the
+  standard =insert-register=.  If, however, you just want to increment a
+  single number through a keyboard macro, then just use the counter
+  provided by that facility (refer to my video on [[https://protesilaos.com/codelog/2019-10-14-emacs-easier-kmacro-counter/][easier kmacro counter]]
+  from 2019-10-14).
++ The registers that store text as a string or a rectangle rely on the
+  active region to capture the data.  They are also great for keyboard
+  macros where you cannot rely on yanking from the head of the kill ring
+  (because, say, you are killing other things which push that value
+  further down).  Note though that =increment-register= has a different
+  behaviour when applied to them, where it will append to the register
+  instead (with an option to override the previous value).
++ While on the topic of appending to registers, I define several
+  functions that change how the accumulation of text is supposed to
+  happen.  They introduce a space or line separator between the entries
+  you {ap,pre}-pend to the register.
++ In my testing, I could never make =window-configuration-to-register=
+  persist between sessions (see section on [[#h:68d57dd2-4df1-4b7a-8766-231216e6cd9c][Emacs server and desktop]]).
+  Whereas all other registers retain their values.  So use this command
+  to store window configurations that are otherwise transient in nature.
+  For more permanent setups, rely on =frameset-to-register= which will
+  produce a new frame (or more if you had) with all the windows in
+  place.  Remember that you can always go back to your previous window
+  configuration without using registers, such as with the built-in
+  =winner-mode= (see section on [[#h:6b4f7792-6ccd-45d5-b262-01d200639072][window history and directional motions]]).
++ While on the topics of storing registers across sessions, I find that
+  sometimes I will collect too many registers that I do not really need
+  any more.  So =me/clear-registers= just resets the list.
+
+#+begin_src emacs-lisp
+(use-package register
+  :commands (me/clear-registers
+             me/append-register-line-separator
+             me/append-register-space-separator
+             me/prepend-register-line-separator
+             me/prepend-register-space-separator)
+  :config
+  ;;;;;; Use this if you need it
+  ;;;; Define f5 as an alias for C-x r
+  ;; (global-set-key (kbd "<f5>") (lookup-key global-map (kbd "C-x r")))
+
+  (defun me/clear-registers ()
+    "Remove all saved registers."
+    (interactive)
+    (setq register-alist nil))
+
+  (defun me/append-register-space-separator (start end)
+    "Append region to register with space in between entries.
+
+A prompt will ask for the register to operate on."
+    (interactive "r")
+    (let* ((prompt (register-read-with-preview
+                    "Append to register with space separator: ")))
+      (setq register-separator ?+)
+      (set-register register-separator " ")
+      (append-to-register prompt start end nil)))
+
+  (defun me/append-register-line-separator (start end)
+    "Append region to register with an empty line in between entries.
+
+A prompt will ask for the register to operate on."
+    (interactive "r")
+    (let* ((prompt (register-read-with-preview
+                    "Append to register with line separator: ")))
+      (setq register-separator ?+)
+      (set-register register-separator "\n\n")
+      (append-to-register prompt start end nil)))
+
+  (defun me/prepend-register-space-separator (start end)
+    "Prepend region to register with space in between entries.
+
+A prompt will ask for the register to operate on."
+    (interactive "r")
+    (let* ((prompt (register-read-with-preview
+                    "Prepend to register with space separator: ")))
+      (setq register-separator ?+)
+      (set-register register-separator " ")
+      (prepend-to-register prompt start end nil)))
+
+  (defun me/prepend-register-line-separator (start end)
+    "Prepend region to register with an empty line in between entries.
+
+A prompt will ask for the register to operate on."
+    (interactive "r")
+    (let* ((prompt (register-read-with-preview
+                    "Prepend to register with line separator: ")))
+      (setq register-separator ?+)
+      (set-register register-separator "\n\n")
+      (prepend-to-register prompt start end nil))))
 #+end_src
 
 ** Conveniences and minor extras
    :PROPERTIES:
    :CUSTOM_ID: h:271c9122-280b-424e-98f0-af9e4f09bbdb
    :END:
+
+*** Auto revert mode
+:PROPERTIES:
+:CUSTOM_ID: h:7a8422e6-86d1-40f3-add4-0a1c826e44a3
+:END:
+
+This mode ensures that the buffer is updated whenever the file changes.
+A change can happen externally or by some other tool inside of Emacs
+(e.g. kill a Magit diff).
+
+#+begin_src emacs-lisp
+(use-package autorevert
+  :diminish
+  :config
+  (setq auto-revert-verbose t)
+  :hook (after-init-hook . global-auto-revert-mode))
+#+end_src
 
 *** Preserve contents of system clipboard
     :PROPERTIES:
@@ -1663,9 +3095,9 @@ saving.
 #+end_src
 
 *** Generic feedback
-    :PROPERTIES:
-    :CUSTOM_ID: h:1f7c0bf3-8b0e-4baa-b1e0-7e89053d36cb
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: h:1f7c0bf3-8b0e-4baa-b1e0-7e89053d36cb
+:END:
 
 The common thread of these options is the feedback they provide us with
 or simplify common tasks so that /their/ feedback does not cause friction:
@@ -1694,18 +3126,74 @@ or simplify common tasks so that /their/ feedback does not cause friction:
   (setq echo-keystrokes 0.25)
   (setq ring-bell-function 'ignore)
 
+  (setq use-file-dialog nil)
+  (setq use-dialog-box t)               ; only for mouse events
+  (setq inhibit-splash-screen t)
+
   (defalias 'yes-or-no-p 'y-or-n-p)
   (put 'narrow-to-region 'disabled nil)
   (put 'upcase-region 'disabled nil)
   (put 'downcase-region 'disabled nil)
   (put 'dired-find-alternate-file 'disabled nil)
-  (put 'overwrite-mode 'disabled t))
+  (put 'overwrite-mode 'disabled t)
+  (put 'erase-buffer 'disabled nil)
+  (put 'set-goal-column 'disabled nil))
 #+end_src
 
+*** Altered zap and easier repeats
+:PROPERTIES:
+:CUSTOM_ID: h:5f6ffe61-f0cc-41ad-9d2f-46ad181c3a00
+:END:
+
+I seldom use the functionality related to this section, but when I do I
+prefer it to work the way I expect.  =zap-up-to-char= will delete
+everything from point up to the character you provide it with.  Think of
+how you may want to delete a file name but keep its file type extension.
+
+The repeat command is bound by default to =C-x z=.  I make it so that
+subsequent repetitions require only hitting another =z=.  In practice
+though, you should not bother with this.  Let keyboard macros handle
+that task.
+
+*Pro tip:* to make a keyboard macro out of your most recent commands,
+use =C-x C-k l= which calls =kmacro-edit-lossage=.  The list is editable, so
+remove anything that is not required and then save what is left.  The
+result is stored as the latest keyboard macro (and you also have the
+power to cycle through kmacros, store them in specific keys, etc.).
+
+Moving on to the mark, practically every Emacs motion that operates on a
+portion of text will set the mark automatically.  You can also do it
+manually with =C-SPC= (hit it twice if you do not wish to activate the
+region).  It is then possible to cycle through the marks in reverse
+order by passing a prefix argument =C-u C-SPC=.  With the evaluation of
+=set-mark-command-repeat-pop= as =t= we can continue cycling by repeated
+presses of =C-SPC=.  Again though, this is not the type of functionality I
+rely on: for more deliberate actions of this sort, consider Emacs'
+notion of "registers".
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :config
+  (setq repeat-on-final-keystroke t)
+  (setq set-mark-command-repeat-pop t)
+  :bind ("M-z" . zap-up-to-char))
+#+end_src
+
+*** Open config.org with C-c o c
+#+BEGIN_SRC emacs-lisp
+  (use-package emacs
+    :config
+    (defun me/open-config-file ()
+      "Edit the ~/.emacs.d/config.org."
+      (interactive)
+      (find-file "~/.emacs.d/config.org"))
+    :bind (("C-c o c" . me/open-config-file)))
+
+#+END_SRC
 *** Package lists
-    :PROPERTIES:
-    :CUSTOM_ID: h:0d36996d-c12d-42e6-a388-b67c548c4a4b
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: h:0d36996d-c12d-42e6-a388-b67c548c4a4b
+:END:
 
 With this I just want to enable line highlighting when browsing the list
 of packages.  I generally use =hl-line-mode= on all interfaces where the
@@ -1716,117 +3204,519 @@ current line is more important than the exact column of the point.
   :commands (list-packages
              package-refresh-contents
              package-list-packages)
-  :hook (package-menu-mode . hl-line-mode))
+  :config
+  ;; All variables are for Emacs 28+
+  (setq package-name-column-width 40)
+  (setq package-version-column-width 14)
+  (setq package-status-column-width 12)
+  (setq package-archive-column-width 8)
+  :hook (package-menu-mode-hook . hl-line-mode))
 #+end_src
 
-*** Exec path from shell
+* Language settings for code and prose
+   :PROPERTIES:
+   :CUSTOM_ID: h:8fc1f9ca-f5ae-407a-b721-aab414ca657b
+   :END:
+
+** Support for various major modes
+*** Lsp mode
 #+BEGIN_SRC emacs-lisp
-  (use-package exec-path-from-shell
+  (use-package lsp-mode
+    :ensure t
+    :hook ((js-mode . lsp))
+    :commands lsp
+    :config
+    (setq lsp-prefer-capf t
+	  lsp-pyls-plugins-flake8-enabled t
+	  lsp-idle-delay 0.500
+	  lsp-enable-snippet nil
+	  lsp-auto-guess-root nil))
+#+END_SRC
+*** Html
+
+#+BEGIN_SRC emacs-lisp
+
+  ;; TODO Move this to other location in file
+  (use-package emacs
+    :config
+    (defun tag-word-or-region (tag)
+      "Surround current word or region with a given tag."
+      (interactive "sEnter tag (without <>): ")
+      (let (pos1 pos2 bds start-tag end-tag)
+	(setq start-tag (concat "<" tag ">"))
+	(setq end-tag (concat "</" tag ">"))
+	(if (and transient-mark-mode mark-active)
+	    (progn
+	      (goto-char (region-end))
+	      (insert end-tag)
+	      (goto-char (region-beginning))
+	      (insert start-tag))
+	  (progn
+	    (setq bds (bounds-of-thing-at-point 'symbol))
+	    (goto-char (cdr bds))
+	    (insert end-tag)
+	    (goto-char (car bds))
+	    (insert start-tag))))))
+#+END_SRC
+*** JavaScript
+
+#+BEGIN_SRC emacs-lisp
+  (use-package js
+    :ensure nil
+    :defer t
+    :custom
+    (js-indent-level 2)
+
+    :config
+    (defun me/add-node-modules-path ()
+      "Add `node_modules' in current project to exec path."
+      (interactive)
+      ;; TODO: make async
+      (let ((node-path (shell-command-to-string "npm bin")))
+        (when node-path
+          (progn
+            (make-local-variable 'exec-path)
+            (add-to-list 'exec-path (string-trim node-path))))))
+
+    :hook (js-mode . me/add-node-modules-path))
+
+  (use-package flymake-eslint
+    :ensure
+    :config
+    (add-hook 'js-mode-hook
+              (lambda ()
+                (flymake-eslint-enable))))
+
+  (use-package prettier-js
+    :ensure t
+    :hook (js-mode . prettier-js-mode))
+
+#+END_SRC
+
+*** Python
+
+#+BEGIN_SRC emacs-lisp
+(use-package python
+  :ensure nil
+  :hook (python-mode . turn-on-prettify-symbols-mode))
+
+#+END_SRC
+*** Clojure
+
+#+BEGIN_SRC emacs-lisp
+(use-package cider
+  :ensure t
+  :defer t
+  :config
+  ;; REPL related stuff
+
+  ;; REPL history file
+  (setq cider-repl-history-file "~/.emacs.d/cider-history")
+
+  ;; nice pretty printing
+  (setq cider-repl-use-pretty-printing t)
+
+  ;; nicer font lock in REPL
+  (setq cider-repl-use-clojure-font-lock t)
+
+  ;; result prefix for the REPL
+  (setq cider-repl-result-prefix ";; => ")
+
+  ;; never ending REPL history
+  (setq cider-repl-wrap-history t)
+
+  ;; looong history
+  (setq cider-repl-history-size 3000)
+
+  ;; eldoc for clojure
+  (add-hook 'cider-mode-hook #'eldoc-mode)
+
+
+  ;; error buffer not popping up
+  (setq cider-show-error-buffer nil))
+
+#+END_SRC
+*** Ocaml
+#+BEGIN_SRC emacs-lisp
+  (use-package tuareg
     :ensure t
     :config
-    (exec-path-from-shell-initialize))
+    (add-hook 'tuareg-mode-hook #'electric-pair-local-mode)
+    ;; (add-hook 'tuareg-mode-hook 'tuareg-imenu-set-imenu)
+    (setq auto-mode-alist
+	  (append '(("\\.ml[ily]?$" . tuareg-mode)
+		    ("\\.topml$" . tuareg-mode))
+		  auto-mode-alist)))
+
+  (use-package merlin
+    ;; note: git clone https://github.com/ocaml/merlin to ~/.emacs.d/bootleg
+    :load-path "~/.emacs.d/bootleg/merlin/emacs/"
+    :config
+    (setq merlin-command (shell-cmd "which ocamlmerlin"))
+    (setq merlin-completion-with-doc t)
+
+    ;; Make company aware of merlin
+    (with-eval-after-load 'company
+      (add-hook 'merlin-mode-hook 'company-mode)
+      (add-to-list 'company-backends 'merlin-company-backend))
+
+    :bind (:map merlin-mode-map
+		("M-." . merlin-locate)
+		("M-," . merlin-pop-stack)
+		("M-m" . merlin-error-next)
+		("M-n" . merlin-error-prev)
+		("C-c C-o" . merlin-occurrences)
+		("C-c C-j" . merlin-jump)
+		("C-c i" . merlin-locate-ident)
+		("C-c C-e" . merlin-iedit-occurrences))
+    :hook
+    ;; Start merlin on ml files
+    (reason-mode . merlin-mode)
+    (tuareg-mode . merlin-mode)
+    (caml-mode-hook . merlin-mode))
+
+  (use-package ocamlformat
+    :ensure t
+    :config
+    (add-hook 'tuareg-mode-hook (lambda ()
+				  (define-key tuareg-mode-map (kbd "C-M-<tab>") #'ocamlformat)
+				  (add-hook 'before-save-hook #'ocamlformat-before-save))))
+
+  (use-package utop :defer t
+    :init
+    (autoload 'utop-minor-mode "utop" "Minor mode for utop" t)
+    (add-hook 'tuareg-mode-hook 'utop-minor-mode)
+    :config
+    (if (executable-find "opam")
+	(setq utop-command "opam config exec -- utop -emacs")
+      (warn "Cannot find \"opam\" executable.")))
 #+END_SRC
+
+** Line numbers
+#+BEGIN_SRC emacs-lisp
+  (use-package emacs
+    :hook (prog-mode . display-line-numbers-mode)
+    :config
+    (setq-default display-line-numbers-width 4
+		  display-line-numbers-widen t))
+#+END_SRC
+** Recognise subwords
+:PROPERTIES:
+:CUSTOM_ID: h:899cff89-a517-41d5-8c55-b91c6aba8c9d
+:END:
+
+It is better you do =C-h f subword-mode=.  Basically, this alters the
+way Emacs understands word boundaries.  So, /camelCaseWords/ are
+exposed as their constituents rather than one long word, meaning that
+motions will behave accordingly.
+
+#+begin_src emacs-lisp
+  (use-package subword
+    :hook (prog-mode-hook . subword-mode))
+#+end_src
+** Configure 'electric' behaviour
+:PROPERTIES:
+:CUSTOM_ID: h:ed95ef3e-75e6-4e53-b3bc-4aee540fe3d9
+:END:
+
+Emacs labels as "electric" any behaviour that involves contextual
+auto-insertion of characters.  This is a summary of my settings:
+
++ Indent automatically.
++ If =electric-pair-mode= is enabled (which I might do manually), insert
+  quotes and brackets in pairs.  Only do so if there is no alphabetic
+  character after the cursor.
++ The cryptic numbers in the pairs set, correspond to curly single and
+  double quotes and these =«»=.  The contents of this set are always
+  inserted in pairs, regardless of major mode.
+  + To get those numbers, evaluate =(string-to-char CHAR)= where CHAR is
+    the one you are interested in.  For example, get the literal tab's
+    character with =(string-to-char "\t")=.
++ While inputting a pair, inserting the closing character will just skip
+  over the existing one, rather than add a new one.  So typing =(= will
+  insert =()= and then typing =)= will just be the same as moving forward
+  one character =C-f=.
++ Do not skip over whitespace when operating on pairs.  Combined with
+  the above point, this means that a new character will be inserted,
+  rather than be skipped over.  I find this better, because it prevents
+  the point from jumping forward, plus it allows for more natural
+  editing.
++ The whitespace characters are space (=\s=), tab (=\t=), and newline (=\n=).
++ The rest concern the conditions for transforming quotes into their
+  curly equivalents.  I keep this disabled, because curly quotes are
+  distinct characters.  It is difficult to search for them.  Just note
+  that on GNU/Linux you can type them directly by hitting the "compose"
+  key and then an angled bracket (=<= or =>=) followed by a quote mark.
+
+#+begin_src emacs-lisp
+(use-package electric
+  :config
+  (setq electric-pair-inhibit-predicate'electric-pair-conservative-inhibit)
+  (setq electric-pair-preserve-balance t)
+  (setq electric-pair-pairs
+        '((8216 . 8217)
+          (8220 . 8221)
+          (171 . 187)))
+  (setq electric-pair-skip-self 'electric-pair-default-skip-self)
+  (setq electric-pair-skip-whitespace nil)
+  (setq electric-pair-skip-whitespace-chars
+        '(9
+          10
+          32))
+  (setq electric-quote-context-sensitive t)
+  (setq electric-quote-paragraph t)
+  (setq electric-quote-string nil)
+  (setq electric-quote-replace-double t)
+  :hook (after-init-hook . (lambda ()
+                             (electric-indent-mode 1)
+                             (electric-pair-mode -1)
+                             (electric-quote-mode -1))))
+#+end_src
+
+** Parentheses (show-paren-mode)
+:PROPERTIES:
+:CUSTOM_ID: h:3d374354-843f-4efa-aa38-1ba2c9ccc14c
+:END:
+
+Configure the mode that highlights matching delimiters or parentheses.
+I consider this of utmost importance when working with languages such as
+elisp.
+
+Summary of what these do:
+
++ Activate the mode upon startup.
++ Show the matching delimiter/parenthesis if on screen, else show
+  nothing.  It is possible to highlight the expression enclosed by the
+  delimiters, by using either =mixed= or =expression=.  The latter always
+  highlights the entire balanced expression, while the former will only
+  do so if the matching delimiter is off screen.
++ =show-paren-when-point-in-periphery= lets you highlight parentheses even
+  if the point is in their vicinity.  This means the beginning or end of
+  the line, with space in between.  I used that for a long while and it
+  server me well.  Now that I have a better understanding of Elisp, I
+  disable it.
++ Do not highlight a match when the point is on the inside of the
+  parenthesis.
+
+#+begin_src emacs-lisp
+(use-package paren
+  :config
+  (setq show-paren-style 'parenthesis)
+  (setq show-paren-when-point-in-periphery nil)
+  (setq show-paren-when-point-inside-paren nil)
+  :hook (after-init-hook . show-paren-mode))
+#+end_src
+** Tabs, indentation, and the TAB key
+:PROPERTIES:
+:CUSTOM_ID: h:d51d37df-4e58-4e0b-85a1-019ceda342f6
+:END:
+
+I believe tabs, in the sense of inserting the tab character, are best
+suited for indentation.  While spaces are superior at precisely aligning
+text.  However, I understand that elisp uses its own approach, which I
+do not want to interfere with.  Also, Emacs tends to perform alignments
+by mixing tabs with spaces, which /can actually lead to misalignments/
+depending on certain variables such as the size of the tab.  As such, I
+am disabling tabs by default.
+
+If there ever is a need to use different settings in other modes, we can
+customise them via hooks.  This is not an issue I have encountered yet
+and am therefore refraining from solving a problem that does not affect
+me.
+
+Note that =tab-always-indent= will first do indentation and then try to
+complete whatever you have typed in.  I control how completion works for
+that particular function in my [[#h:98876022-57cc-40de-936e-4ee42cefd69a][in-buffer completions]] section.
+
+#+begin_src emacs-lisp
+(use-package emacs
+  :config
+  (setq-default tab-always-indent 'complete)
+  (setq-default tab-width 4)
+  (setq-default indent-tabs-mode nil))
+#+end_src
+** Code and text linters
+:PROPERTIES:
+:CUSTOM_ID: h:20448ad8-9371-4e00-b88b-6b93f4c654d9
+:END:
+
+*** Flymake
+:PROPERTIES:
+:CUSTOM_ID: h:b8bfcc05-c0d3-4093-b3fe-f06187d22c6a
+:END:
+
+This is a built-in linter interface.  It visualises in a buffer what you
+would otherwise get on the command-line prompt (or compilation log),
+while it also marks the line[s] where the note, warning, or error
+occurs.  In short, it is quite a nice tool to have.
+
+Several extensions to Flymake are already available, mostly targeted at
+programmers.  For my case, there is no need for any of those, while
+Flymake can lint Elisp without any further configuration.
+
+#+begin_src emacs-lisp
+(use-package flymake
+  :after project
+  :commands flymake-mode
+  :init
+  (setq flymake-fringe-indicator-position 'left-fringe)
+  (setq flymake-suppress-zero-counters t)
+  (setq flymake-start-on-flymake-mode t)
+  (setq flymake-no-changes-timeout nil)
+  (setq flymake-start-on-save-buffer t)
+  (setq flymake-proc-compilation-prevents-syntax-check t)
+  (setq flymake-wrap-around nil)
+
+  ;; NOTE: this is just a placeholder.  I need to rework the project
+  ;; directory part once I make changes to my project.el configurations.
+  (defun me/flymake-mode-activate ()
+    "Activate `flymake-mode' for my code projects."
+    (let* ((projects (mapcar #'file-name-as-directory
+                             (me/project--list-projects)))
+           (dir (or (vc-root-dir) default-directory))
+           (modes (delq nil
+                        (mapcar
+                         (lambda (x)
+                           (let ((y (car x)))
+                             (when (and (symbolp y) (symbol-value y))
+                               x)))
+                         minor-mode-alist))))
+      (if (and (eq buffer-read-only nil)
+               (member dir projects)
+               (not (member 'org-src-mode modes)))
+          (flymake-mode 1)
+        (flymake-mode -1))))
+
+  :hook (prog-mode-hook . me/flymake-mode-activate)
+  :bind (:map flymake-mode-map
+              ("C-c ! s" . flymake-start)
+              ("C-c ! d" . flymake-show-diagnostics-buffer)
+              ("C-c ! n" . flymake-goto-next-error)
+              ("C-c ! p" . flymake-goto-prev-error)))
+
+#+end_src
+
+** Eldoc (elisp live documentation feedback)
+:PROPERTIES:
+:CUSTOM_ID: h:d0f76937-4f54-401c-aae8-ffadf8697357
+:END:
+
+When editing elisp, this mode will display useful information about the
+construct at point in the echo area.  For functions it will display the
+list of arguments they accept.  While it will show the the first
+sentence of a variable's documentation string.
+
+At first, I dismissed this package.  Upon closer inspection, it does
+offer a lightweight complementary facility to that of the standard help
+commands: =C-h f FUNCTION=, =C-h v VARIABLE=.
+
+#+begin_src emacs-lisp
+(use-package eldoc
+  :diminish
+  :config
+  (global-eldoc-mode 1))
+#+end_src
+
 * History and state
-  :PROPERTIES:
-  :CUSTOM_ID: h:1d9437fe-1355-4c2f-8ea7-6668b4d0399b
-  :END:
+:PROPERTIES:
+:CUSTOM_ID: h:1d9437fe-1355-4c2f-8ea7-6668b4d0399b
+:END:
 
 This section contains configurations for packages that are dedicated to
 the task of recording the state of various Emacs tools, such as the
-history of the minibuffer or the list of recently-visited files.
+history of the minibuffer or the list of recently visited files.
+
+In practice, these are some of the most useful configurations one can
+make, as lots of functions depend on them.  For example, a record of the
+minibuffer's history of inputs allows the completion framework to guess
+the most likely course of action.  Typing =M-x g= gives me =gnus= as the
+first possible option, which is exactly what I want.
 
 ** Record various types of history
-   :PROPERTIES:
-   :CUSTOM_ID: h:ab868c1a-7ca6-4f54-83d8-eab49447da82
-   :END:
+:PROPERTIES:
+:CUSTOM_ID: h:ab868c1a-7ca6-4f54-83d8-eab49447da82
+:END:
 *** Recentf (recent files and directories)
-    :PROPERTIES:
-    :CUSTOM_ID: h:5723c4bb-ff6c-449f-bb60-be66fab3f137
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: h:5723c4bb-ff6c-449f-bb60-be66fab3f137
+:END:
 
-This is a built-in mode that keeps track of the files you have opened,
-allowing you go back to them faster.  It can also integrate with a
-completion framework to populate their "virtual buffers" list.
+This is a built-in minor mode that keeps track of the files you have
+opened, allowing you revisit them faster.  Its true power consists in
+the fact that its data, maintained in =recentf-list=, is a simple
+variable.  This means that we can access it through any relevant piece
+of Elisp functionality.
 
-A few words about the variables I configure:
+To that end, the functions I define herein are meant to either control
+the contents of the list or allow me to access them through my
+completion framework or a dedicated file listing (see, in particular,
+[[#h:07e173ea-e7ed-4fc0-ba3c-e44b403359a7][Tools for completion candidate listing]] and [[#h:c519300f-8a9a-472b-b26d-c2f49adbdb5d][configurations for Dired]]).
 
-+ Enable the mode and define the file it should use to store the list of
-  files.
-+ Allow only 10 items in the menu.  This is used by the menu bar, which
-  I disable by default.
-+ Store up to 200 items at a time.  The number is arbitrary but seems
-  good enough for me to (a) find common items quickly, (b) do not keep
-  track of everything I ever access.
-+ Do not prepend a number to the first ten files that appear in the
-  dedicated =recentf= buffer (accessible via =recentf-open-files=).
-
-Now some notes on my extensions:
-
-+ The functions whose name starts with "rjs" are intended to address a
-  limitation in the original package that does not keep track of file
-  name changes.  With these we make sure that the list is updated any
-  time a file is moved/renamed.  My sole contribution to these functions
-  is to append the =recentf-cleanup= function where appropriate, to
-  ensure that only the new name is tracked, while the old is discarded.
-+ The function that includes Dired buffers to the list, is extracted
-  from the [[https://www.emacswiki.org/emacs/recentf-ext.el][recentf-ext file on the Emacs Wiki]].  I use this in tandem
-  with my completion framework's virtual buffers.  This practically
-  eliminates whatever need for a dedicated command to display
-  recently-accessed directories (dired buffers).
+Note that there exists a built-in =recentf-open-files= function for
+accessing the recent files through a bespoke buffer.  I find that I have
+no use for it.
 
 #+begin_src emacs-lisp
 (use-package recentf
   :config
   (setq recentf-save-file "~/.emacs.d/recentf")
-  (setq recentf-max-menu-items 10)
   (setq recentf-max-saved-items 200)
-  (setq recentf-show-file-shortcuts-flag nil)
+  (setq recentf-exclude '(".gz" ".xz" ".zip" "/elpa/" "/ssh:" "/sudo:"))
 
-  ;; rename entries in recentf when moving files in dired
-  (defun rjs/recentf-rename-directory (oldname newname)
-    ;; oldname, newname and all entries of recentf-list should already
-    ;; be absolute and normalised so I think this can just test whether
-    ;; oldname is a prefix of the element.
-    (setq recentf-list
-          (mapcar (lambda (name)
-                    (if (string-prefix-p oldname name)
-                        (concat newname (substring name (length oldname)))
-                      name))
-                  recentf-list))
-    (recentf-cleanup))
+  (defun me/recentf-keep-predicate (file)
+    "Additional conditions for saving in `recentf-list'.
+Add this function to `recentf-keep'.
 
-  (defun rjs/recentf-rename-file (oldname newname)
-    (setq recentf-list
-          (mapcar (lambda (name)
-                    (if (string-equal name oldname)
-                        newname
-                      oldname))
-                  recentf-list))
-    (recentf-cleanup))
+NEEDS REVIEW."
+    (cond
+     ((file-directory-p file) (file-readable-p file))))
+  (add-to-list 'recentf-keep 'me/recentf-keep-default-predicate)
 
-  (defun rjs/recentf-rename-notify (oldname newname &rest args)
-    (if (file-directory-p newname)
-        (rjs/recentf-rename-directory oldname newname)
-      (rjs/recentf-rename-file oldname newname)))
+  (defun me/recentf (&optional input)
+    "Select item from `recentf-list' using completion.
+Use INPUT as an initial, yet editable, filter.
 
-  (advice-add 'dired-rename-file :after #'rjs/recentf-rename-notify)
+The user's $HOME directory is abbreviated as a tilde."
+    (interactive)
+    (let* ((files (mapcar 'abbreviate-file-name recentf-list))
+           (f (completing-read "Open recentf entry: " files nil t
+                               (when input input))))
+      (find-file f)))
 
-  (defun contrib/recentf-add-dired-directory ()
-    "Include Dired buffers in the `recentf' list.  Particularly
-useful when combined with a completion framework's ability to
-display virtual buffers."
-    (when (and (stringp dired-directory)
-               (equal "" (file-name-nondirectory dired-directory)))
-      (recentf-add-file dired-directory)))
+  (defun me/recentf-dirs (&optional arg)
+    "Select directory from `recentf-list' using completion.
+With \\[universal-argument] present the list in a `dired' buffer.
+This buffer is meant to be reused by subsequent invocations of
+this command (otherwise you need to remove the `when' expression.
 
-  :hook ((after-init . recentf-mode)
-         (dired-mode . contrib/recentf-add-dired-directory)))
+Without \\[universal-argument], the user's $HOME directory is
+abbreviated as a tilde.  In the Dired buffer paths are absolute."
+    (interactive "P")
+    (let* ((list (mapcar 'abbreviate-file-name recentf-list))
+           (dirs (delete-dups
+                  (mapcar (lambda (file)
+                            (if (file-directory-p file)
+                                (directory-file-name file)
+                              (substring (file-name-directory file) 0 -1)))
+                          list)))
+           (buf "*Recentf Dired*")
+           (default-directory "~"))
+      (when (get-buffer buf)
+        (kill-buffer buf))
+      (if arg
+          (dired (cons (generate-new-buffer-name buf) dirs))
+        (find-file
+         (completing-read "Recent dirs: " dirs nil t)))))
+
+  :hook (after-init-hook . recentf-mode)
+  :bind (("s-r" . me/recentf)
+         ("C-x C-r" . me/recentf-dirs)))
 #+end_src
 
-*** Minibuffer history
-    :PROPERTIES:
-    :CUSTOM_ID: h:2733674b-51f9-494e-b34d-e8842ac4ef96
-    :END:
+*** Minibuffer history (savehist-mode)
+:PROPERTIES:
+:CUSTOM_ID: h:2733674b-51f9-494e-b34d-e8842ac4ef96
+:END:
 
 Keeps a record of actions involving the minibuffer.  This is of
 paramount importance to a fast and efficient workflow involving any
@@ -1834,26 +3724,39 @@ completion framework that leverages the built-in mechanisms.
 
 Emacs will remember your input and choices and will surface the desired
 results towards the top as the most likely candidates.  Make sure to
-also check my [[*Minibuffer essentials and Icomplete (built-in completion)][configurations for the minibuffer and icomplete]].
-
-I set the length to a fairly high number, while I make sure that
-duplicate entries remain in tact.  The assumption is that duplicate
-entries increase the likelihood of returning the candidate I am
-searching or.
+also check the section on [[#h:07e173ea-e7ed-4fc0-ba3c-e44b403359a7][Tools for completion candidate listing]].
 
 #+begin_src emacs-lisp
 (use-package savehist
   :config
   (setq savehist-file "~/.emacs.d/savehist")
-  (setq history-length 30000)
-  (setq history-delete-duplicates nil)
+  (setq history-length 1000)
+  (setq history-delete-duplicates t)
   (setq savehist-save-minibuffer-history t)
-  (savehist-mode 1))
+  :hook (after-init-hook . savehist-mode))
 #+end_src
+
+*** Record cursor position
+:PROPERTIES:
+:CUSTOM_ID: h:ae1cad56-c12c-4bd5-a5cc-e85c0ad4b978
+:END:
+
+Just remember where the point is in any given file.  This can often be a
+subtle reminder of what you were doing the last time you visited that
+file, allowing you to pick up from there.
+
+#+begin_src emacs-lisp
+(use-package saveplace
+  :config
+  (setq save-place-file "~/.emacs.d/saveplace")
+  (setq save-place-forget-unreadable-files t)
+  (save-place-mode 1))
+#+end_src
+
 *** Backups
-    :PROPERTIES:
-    :CUSTOM_ID: h:3d2e3e65-b860-4ad7-87d2-24e4e9d0e296
-    :END:
+:PROPERTIES:
+:CUSTOM_ID: h:3d2e3e65-b860-4ad7-87d2-24e4e9d0e296
+:END:
 
 And here are some settings pertaining to backups.  I rarely need those,
 but I prefer to be safe in the knowledge that if something goes awry

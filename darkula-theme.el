@@ -171,6 +171,8 @@
  '(slime-repl-input-face ((t (:inherit 'default :weight bold))))
  '(slime-repl-output-face ((t (:foreground "cyan1"))))
  '(slime-repl-prompt-face ((t (:foreground "#007f00"))))
+ ;; tuareg mode
+ '(tuareg-font-lock-governing-face ((t (:foreground "wheat" :weight normal))))
 )
 
 
