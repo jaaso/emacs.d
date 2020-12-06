@@ -2659,6 +2659,20 @@ other options in the Emacs space (e.g. with =C-u M-x shell=).
   (setq term-scroll-to-bottom-on-output nil))
 #+end_src
 
+** exec-path
+#+BEGIN_SRC EMACS-LISP
+(use-package exec-path-from-shell
+  :ensure t
+  :if (memq window-system '(mac ns))
+  :config
+  (setq exec-path-from-shell-arguments '("-l"))
+  (exec-path-from-shell-initialize)
+  (exec-path-from-shell-copy-envs
+   '("GOPATH" "GO111MODULE" "GOPROXY"
+     "NPMBIN" "LC_ALL" "LANG" "LC_TYPE"
+     "SSH_AGENT_PID" "SSH_AUTH_SOCK" "SHELL"
+     "JAVA_HOME")))
+#+END_SRC
 * General interface and interactions
   :PROPERTIES:
   :CUSTOM_ID: h:b6bd2eea-8269-4029-b446-ee340c12ebc3
