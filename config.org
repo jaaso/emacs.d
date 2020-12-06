@@ -2672,6 +2672,9 @@ other options in the Emacs space (e.g. with =C-u M-x shell=).
      "NPMBIN" "LC_ALL" "LANG" "LC_TYPE"
      "SSH_AGENT_PID" "SSH_AUTH_SOCK" "SHELL"
      "JAVA_HOME")))
+
+(use-package add-node-modules-path
+  :hook ((js-mode . add-node-modules-path)))
 #+END_SRC
 * General interface and interactions
   :PROPERTIES:
