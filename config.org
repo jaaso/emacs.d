@@ -1125,7 +1125,7 @@ you need.  Just a couple of notes:
            ("M-'" . me/insert-pair-completion)
            ("<C-M-backspace>" . backward-kill-sexp)
            ("M-c" . capitalize-dwim)
-           ("M-l" . downcase-dwim)        ; "lower" case
+           ("M-l" . downcase-dwim)
            ("M-u" . upcase-dwim)
            :map text-mode-map
            ("<M-return>" . me/text-mode-heading)))
@@ -1401,10 +1401,9 @@ command incrementally expand the region in the given direction.
     (setq dired-recursive-copies 'always)
     (setq dired-recursive-deletes 'always)
     (setq delete-by-moving-to-trash t)
-    ;;(setq dired-listing-switches "-AFhlv --group-directories-first")
     (setq dired-dwim-target t)
     :hook ((dired-mode . dired-hide-details-mode)
-	   (dired-mode . hl-line-mode)))
+       (dired-mode . hl-line-mode)))
 
   (use-package dired-aux
     :config
@@ -1413,15 +1412,8 @@ command incrementally expand the region in the given direction.
     (setq dired-create-destination-dirs 'ask)
     (setq dired-vc-rename-file t)
     :bind (:map dired-mode-map
-		("C-c +" . dired-create-empty-file)
-		("M-s f" . nil)))
-
-  (use-package find-dired
-    :after dired
-    :config
-    (setq find-ls-option
-	  '("-ls" . "-AGFhlv"))
-    (setq find-name-arg "-iname"))
+        ("C-c +" . dired-create-empty-file)
+        ("M-s f" . nil)))
 
 #+end_src
 
