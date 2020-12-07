@@ -43,6 +43,9 @@
  '(fringe ((t (:foreground "#555555"))))
  '(link ((t (:underline (:color foreground-color :style line) :foreground "#287BDE"))))
  '(link-visited ((t (:underline (:color foreground-color :style line) :foreground "#287BDE" :inherit (link)))))
+ ;; diff
+ '(diff-header ((t (:extend t :background "grey45" :foreground "black"))))
+ '(diff-refine-added ((t (:inherit diff-refine-changed :background "#22aa22" :foreground "black"))))
  ;; searc
  '(isearch ((t (:background "#214283" :box (:line-width -1 :color "#bbbbbb")))))
  ;; other search matches
