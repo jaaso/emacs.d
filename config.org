@@ -1457,7 +1457,7 @@ command incrementally expand the region in the given direction.
            (slot . 0)
            (window-parameters . ((no-other-window . t))))
 	  ;; bottom side window
-          ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\|xref\\|copy history\\).*"
+          ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\|copy history\\).*"
            (display-buffer-in-side-window)
            (window-height . 0.30)
            (side . bottom)
