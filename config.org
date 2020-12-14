@@ -247,6 +247,7 @@ further below):
 	   ("p" . previous-line)
 	   ("f" . next-completion)
 	   ("b" . previous-completion)
+       ("C-g" . me/focus-minibuffer)
 	   ("M-v" . me/focus-minibuffer)))
 #+end_src
 
@@ -3215,6 +3216,12 @@ current line is more important than the exact column of the point.
   (use-package prettier-js
     :ensure t
     :hook (js-mode . prettier-js-mode))
+
+  (use-package js-import
+    :ensure t
+    :config
+    (setq js-import-quote "'")
+    (setq js-import-style "relative"))
 #+END_SRC
 
 *** Python
@@ -3598,60 +3605,61 @@ accessing the recent files through a bespoke buffer.  I find that I have
 no use for it.
 
 #+begin_src emacs-lisp
-(use-package recentf
-  :config
-  (setq recentf-save-file "~/.emacs.d/recentf")
-  (setq recentf-max-saved-items 200)
-  (setq recentf-exclude '(".gz" ".xz" ".zip" "/elpa/" "/ssh:" "/sudo:"))
+  (use-package recentf
+    :config
+    (setq recentf-save-file "~/.emacs.d/recentf")
+    (setq recentf-max-saved-items 200)
+    (setq recentf-exclude '(".gz" ".xz" ".zip" "/elpa/" "/ssh:" "/sudo:"))
 
-  (defun me/recentf-keep-predicate (file)
-    "Additional conditions for saving in `recentf-list'.
-Add this function to `recentf-keep'.
+    (defun me/recentf-keep-predicate (file)
+      "Additional conditions for saving in `recentf-list'.
+  Add this function to `recentf-keep'.
 
-NEEDS REVIEW."
-    (cond
-     ((file-directory-p file) (file-readable-p file))))
-  (add-to-list 'recentf-keep 'me/recentf-keep-default-predicate)
+  NEEDS REVIEW."
+      (cond
+       ((file-directory-p file) (file-readable-p file))))
+    (add-to-list 'recentf-keep 'me/recentf-keep-default-predicate)
 
-  (defun me/recentf (&optional input)
-    "Select item from `recentf-list' using completion.
-Use INPUT as an initial, yet editable, filter.
+    (defun me/recentf (&optional input)
+      "Select item from `recentf-list' using completion.
+  Use INPUT as an initial, yet editable, filter.
 
-The user's $HOME directory is abbreviated as a tilde."
-    (interactive)
-    (let* ((files (mapcar 'abbreviate-file-name recentf-list))
-           (f (completing-read "Open recentf entry: " files nil t
-                               (when input input))))
-      (find-file f)))
+  The user's $HOME directory is abbreviated as a tilde."
+      (interactive)
+      (let* ((files (mapcar 'abbreviate-file-name recentf-list))
+             (f (completing-read "Open recentf entry: " files nil t
+                                 (when input input))))
+        (find-file f)))
 
-  (defun me/recentf-dirs (&optional arg)
-    "Select directory from `recentf-list' using completion.
-With \\[universal-argument] present the list in a `dired' buffer.
-This buffer is meant to be reused by subsequent invocations of
-this command (otherwise you need to remove the `when' expression.
+    (defun me/recentf-dirs (&optional arg)
+      "Select directory from `recentf-list' using completion.
+  With \\[universal-argument] present the list in a `dired' buffer.
+  This buffer is meant to be reused by subsequent invocations of
+  this command (otherwise you need to remove the `when' expression.
 
-Without \\[universal-argument], the user's $HOME directory is
-abbreviated as a tilde.  In the Dired buffer paths are absolute."
-    (interactive "P")
-    (let* ((list (mapcar 'abbreviate-file-name recentf-list))
-           (dirs (delete-dups
-                  (mapcar (lambda (file)
-                            (if (file-directory-p file)
-                                (directory-file-name file)
-                              (substring (file-name-directory file) 0 -1)))
-                          list)))
-           (buf "*Recentf Dired*")
-           (default-directory "~"))
-      (when (get-buffer buf)
-        (kill-buffer buf))
-      (if arg
-          (dired (cons (generate-new-buffer-name buf) dirs))
-        (find-file
-         (completing-read "Recent dirs: " dirs nil t)))))
+  Without \\[universal-argument], the user's $HOME directory is
+  abbreviated as a tilde.  In the Dired buffer paths are absolute."
+      (interactive "P")
+      (let* ((list (mapcar 'abbreviate-file-name recentf-list))
+             (dirs (delete-dups
+                    (mapcar (lambda (file)
+                              (if (file-directory-p file)
+                                  (directory-file-name file)
+                                (substring (file-name-directory file) 0 -1)))
+                            list)))
+             (buf "*Recentf Dired*")
+             (default-directory "~"))
+        (when (get-buffer buf)
+          (kill-buffer buf))
+        (if arg
+            (dired (cons (generate-new-buffer-name buf) dirs))
+          (find-file
+           (completing-read "Recent dirs: " dirs nil t)))))
 
-  :hook (after-init-hook . recentf-mode)
-  :bind (("s-r" . me/recentf)
-         ("C-x C-r" . me/recentf-dirs)))
+    :hook (after-init-hook . recentf-mode)
+    :bind (("s-r" . me/recentf)
+           ("s-R" . me/recentf-dirs)
+           ("C-x C-r" . recentf-open-files)))
 #+end_src
 
 *** Minibuffer history (savehist-mode)
