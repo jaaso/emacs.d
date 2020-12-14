@@ -1446,39 +1446,39 @@ command incrementally expand the region in the given direction.
     :END:
 
 #+begin_src emacs-lisp
-(use-package window
-  :init
-  (setq display-buffer-alist
-	'(
-          ("\\*\\(Help\\|undo-tree\\|lsp-help\\).*"
-           (display-buffer-in-side-window)
-           (window-height . 0.5)
-           (side . bottom)
-           (slot . 0)
-           (window-parameters . ((no-other-window . t))))
-	  ;; bottom side window
-          ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\|copy history\\).*"
-           (display-buffer-in-side-window)
-           (window-height . 0.30)
-           (side . bottom)
-           (slot . -1)
-           (window-parameters . ((no-other-window . t))))
-	  (".*" (display-buffer-reuse-window
-		 display-buffer-same-window)
-	   (reusable-frames . visible))))
+  (use-package window
+    :init
+    (setq display-buffer-alist
+          '(
+            ("\\*\\(Help\\|undo-tree\\|lsp-help\\).*"
+             (display-buffer-at-bottom)
+             (window-height . 0.5)
+             (side . bottom)
+             (slot . 0)
+             (window-parameters . ((no-other-window . t))))
+            ;; bottom side window
+            ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\|copy history\\).*"
+             (display-buffer-at-bottom)
+             (window-height . 0.30)
+             (side . bottom)
+             (slot . -1)
+             (window-parameters . ((no-other-window . t))))
+            (".*" (display-buffer-reuse-window
+                   display-buffer-same-window)
+             (reusable-frames . visible))))
 
-  :hook ((help-mode . visual-line-mode)
-         (custom-mode . visual-line-mode))
-  :bind (("s-n" . next-buffer)
-         ("s-p" . previous-buffer)
-         ("s-o" . other-window)
-         ("s-2" . split-window-below)
-         ("s-3" . split-window-right)
-         ("s-0" . delete-window)
-         ("s-1" . delete-other-windows)
-         ("s-5" . delete-frame)
-         ("C-x +" . balance-windows-area)
-         ("<f8>" . window-toggle-side-windows)))
+    :hook ((help-mode . visual-line-mode)
+           (custom-mode . visual-line-mode))
+    :bind (("s-n" . next-buffer)
+           ("s-p" . previous-buffer)
+           ("s-o" . other-window)
+           ("s-2" . split-window-below)
+           ("s-3" . split-window-right)
+           ("s-0" . delete-window)
+           ("s-1" . delete-other-windows)
+           ("s-5" . delete-frame)
+           ("C-x +" . balance-windows-area)
+           ("<f8>" . window-toggle-side-windows)))
 
 #+end_src
 
@@ -3072,7 +3072,7 @@ or simplify common tasks so that /their/ feedback does not cause friction:
 (use-package emacs
   :config
   (setq frame-title-format '("%b"))
-  (setq echo-keystrokes 0.25)
+  (setq echo-keystrokes 0.1)
   (setq ring-bell-function 'ignore)
 
   (setq use-file-dialog nil)
@@ -3168,19 +3168,6 @@ current line is more important than the exact column of the point.
    :END:
 
 ** Support for various major modes
-*** Lsp mode
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :ensure t
-    :hook ((js-mode . lsp))
-    :commands lsp
-    :config
-    (setq lsp-prefer-capf t
-      lsp-pyls-plugins-flake8-enabled t
-      lsp-idle-delay 0.500
-      lsp-enable-snippet nil
-      lsp-auto-guess-root nil))
-#+END_SRC
 *** Html
 
 #+BEGIN_SRC emacs-lisp
@@ -3214,24 +3201,25 @@ current line is more important than the exact column of the point.
     :ensure nil
     :defer t
     :config
-    (setq js-indent-level 2))
+    (setq js-indent-level 2)
 
-  (use-package add-node-modules-path
-    :ensure t
-    :after js
-    :hook ((js-mode . add-node-modules-path)))
+    (use-package add-node-modules-path
+      :ensure t
+      :config
+      (add-hook 'js-mode-hook #'add-node-modules-path))
 
-  (use-package flymake-eslint
-    :ensure
-    :after add-node-modules-path
-    :config
-    (add-hook 'js-mode-hook
-              (lambda ()
-                (flymake-eslint-enable))))
+    (use-package flymake-eslint
+      :ensure
+      :after add-node-modules-path
+      :config
+      (add-hook 'js-mode-hook
+                (lambda ()
+                  (flymake-eslint-enable))))
 
-  (use-package prettier-js
-    :ensure t
-    :hook (js-mode . prettier-js-mode))
+    (use-package prettier-js
+      :ensure t
+      :hook (js-mode . prettier-js-mode)))
+
 
 #+END_SRC
 
@@ -3560,6 +3548,21 @@ commands: =C-h f FUNCTION=, =C-h v VARIABLE=.
   :config
   (global-eldoc-mode 1))
 #+end_src
+
+*** Lsp mode
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :hook ((js-mode . lsp))
+    :commands lsp
+    :config
+    (setq
+      lsp-prefer-capf t
+      lsp-pyls-plugins-flake8-enabled t
+      lsp-idle-delay 0.500
+      lsp-enable-snippet nil
+      lsp-auto-guess-root nil))
+#+END_SRC
 
 * History and state
 :PROPERTIES:
