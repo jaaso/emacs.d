@@ -3197,30 +3197,24 @@ current line is more important than the exact column of the point.
 *** JavaScript
 
 #+BEGIN_SRC emacs-lisp
+  (use-package add-node-modules-path
+    :ensure t
+    :after js
+    :hook (js-mode . add-node-modules-path))
+
   (use-package js
     :ensure nil
     :defer t
-    :config
-    (setq js-indent-level 2)
+    :custom
+    (js-indent-level 2))
 
-    (use-package add-node-modules-path
-      :ensure t
-      :config
-      (add-hook 'js-mode-hook #'add-node-modules-path))
+  (use-package flymake-eslint
+    :ensure t
+    :hook (js-mode . prettier-js-mode))
 
-    (use-package flymake-eslint
-      :ensure
-      :after add-node-modules-path
-      :config
-      (add-hook 'js-mode-hook
-                (lambda ()
-                  (flymake-eslint-enable))))
-
-    (use-package prettier-js
-      :ensure t
-      :hook (js-mode . prettier-js-mode)))
-
-
+  (use-package prettier-js
+    :ensure t
+    :hook (js-mode . prettier-js-mode))
 #+END_SRC
 
 *** Python
