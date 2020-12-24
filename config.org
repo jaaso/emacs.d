@@ -1457,7 +1457,7 @@ command incrementally expand the region in the given direction.
              (slot . 0)
              (window-parameters . ((no-other-window . t))))
             ;; bottom side window
-            ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\|copy history\\).*"
+            ("\\*\\(Output\\|Register Preview\\|Flow Output\\|Completions\\|copy history\\|jest\\).*"
              (display-buffer-at-bottom)
              (window-height . 0.30)
              (side . bottom)
@@ -3168,6 +3168,20 @@ current line is more important than the exact column of the point.
    :END:
 
 ** Support for various major modes
+*** Lsp mode
+#+BEGIN_SRC emacs-lisp
+  (use-package lsp-mode
+    :ensure t
+    :hook ((js-mode . lsp))
+    :commands lsp
+    :config
+    (setq
+      lsp-prefer-capf t
+      lsp-pyls-plugins-flake8-enabled t
+      lsp-idle-delay 0.500
+      lsp-enable-snippet nil
+      lsp-auto-guess-root nil))
+#+END_SRC
 *** Html
 
 #+BEGIN_SRC emacs-lisp
@@ -3210,11 +3224,20 @@ current line is more important than the exact column of the point.
 
   (use-package flymake-eslint
     :ensure t
-    :hook (js-mode . prettier-js-mode))
+    :hook (js-mode . flymake-eslint-enable))
 
   (use-package prettier-js
     :ensure t
-    :hook (js-mode . prettier-js-mode))
+    :hook (js-mode . prettier-js-mode)
+    :config
+    (setq prettier-js-args '("--trailing-comma" "all"
+                             "--single-quote" "true"
+                             "--print-width" "120")))
+
+  (use-package jest
+    :ensure t
+    :bind (("C-c t f" . jest-file)))
+
 #+END_SRC
 
 *** Python
@@ -3542,21 +3565,6 @@ commands: =C-h f FUNCTION=, =C-h v VARIABLE=.
   :config
   (global-eldoc-mode 1))
 #+end_src
-
-*** Lsp mode
-#+BEGIN_SRC emacs-lisp
-  (use-package lsp-mode
-    :ensure t
-    :hook ((js-mode . lsp))
-    :commands lsp
-    :config
-    (setq
-      lsp-prefer-capf t
-      lsp-pyls-plugins-flake8-enabled t
-      lsp-idle-delay 0.500
-      lsp-enable-snippet nil
-      lsp-auto-guess-root nil))
-#+END_SRC
 
 * History and state
 :PROPERTIES:
