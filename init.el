@@ -1,71 +1,189 @@
-;; init.el --- Personal GNU Emacs configuration file.
+;; -*- coding: utf-8; lexical-binding: t; -*-
 
-;; Copyright (c) 2019-2020 Protesilaos Stavrou <info@protesilaos.com>
-;;
-;; This file is free software: you can redistribute it and/or modify it
-;; under the terms of the GNU General Public License as published by the
-;; Free Software Foundation, either version 3 of the License, or (at
-;; your option) any later version.
-;;
-;; This file is distributed in the hope that it will be useful, but
-;; WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;; General Public License for more details.
-;;
-;; You should have received a copy of the GNU General Public License
-;; along with this file.  If not, see <http://www.gnu.org/licenses/>.
+;;; Package config
 
-;;; Commentary:
-
-;; This file sets up the essentials for incorporating my init org
-;; file.  This is known as "literate programming", which I think is
-;; particularly helpful for sharing Emacs configurations with a wider
-;; audience that includes new or potential users (I am still very new
-;; myself).
-;;
-;; See my dotfiles: https://gitlab.com/protesilaos/dotfile
-
-;;; Code:
-
-;; A big contributor to startup times is garbage collection. We up the gc
-;; threshold to temporarily prevent it from running, and then reset it later
-;; using a hook.
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6)
-
-;; Keep a ref to the actual file-name-handler
-(defvar default-file-name-handler-alist file-name-handler-alist)
-
-;; Set the file-name-handler to nil (because regexing is cpu intensive)
-(setq file-name-handler-alist nil)
-
-;; Reset file-name-handler-alist after initialization
-(add-hook 'emacs-startup-hook
-  (lambda ()
-    (setq gc-cons-threshold 16777216
-          gc-cons-percentage 0.1
-          file-name-handler-alist default-file-name-handler-alist)))
+(setq-default package-quickstart t)
 
 (require 'package)
 
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
-;; Initialise the packages, avoiding a re-initialisation.
 (unless (bound-and-true-p package--initialized)
   (setq package-enable-at-startup nil)
   (package-initialize))
 
-;;; Setup use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(defvar package-list)
+(setq package-list '(company magit
+			     lsp-mode
+			     flymake-eslint prettier-js add-node-modules-path))
 
-(eval-when-compile
-  (require 'use-package))
+(unless package-archive-contents
+  (package-refresh-contents))
 
-(setq use-package-always-ensure nil)
+(dolist (package package-list)
+  (unless (package-installed-p package)
+    (package-install package)))
 
-(require 'org)
-(setq vc-follow-symlinks t)
-(org-babel-load-file (expand-file-name "~/.emacs.d/config.org"))
+;;; Base config
+
+(setq-default custom-file (expand-file-name "custom.el" user-emacs-directory))
+
+(unless (file-exists-p custom-file)
+  (write-region "" nil custom-file))
+
+(load custom-file)
+
+(setq-default auto-revert-verbose nil)
+(global-auto-revert-mode t)
+
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
+
+(savehist-mode t)
+(save-place-mode t)
+(auto-compression-mode t)
+(column-number-mode t)
+(line-number-mode t)
+(size-indication-mode t)
+(delete-selection-mode t)
+
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+(setq use-file-dialog nil)
+(setq ring-bell-function 'ignore)
+(setq-default truncate-lines t)
+(setq frame-resize-pixelwise t)
+(setq create-lockfiles nil)
+(setq save-interprogram-paste-before-kill t)
+(setq x-select-enable-clipboard t)
+(setq mac-option-modifier 'super)
+(setq mac-command-modifier 'meta)
+
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+(setq-default display-line-numbers-widen t)
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+(setq js-indent-level 2)
+
+(put 'set-goal-column 'disabled nil)
+
+;;;; Selection with mouse
+(xterm-mouse-mode t)
+(setq-default mouse-sel-mode t
+	      mouse-scroll-delay 0)
+(setq mouse-drag-copy-region t)
+
+;;;; set additional PATH
+(setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+(setq exec-path (append exec-path '("/usr/local/bin")))
+
+;;;; show paren mode
+(show-paren-mode t)
+(setq-default show-paren-delay 0
+	      blink-matching-paren nil)
+
+;;;; isearch
+(setq-default search-nonincremental-instead nil
+	      lazy-highlight-initial-delay 0
+	      isearch-allow-scroll t
+	      isearch-lazy-count t
+	      isearch-yank-on-move 'shift)
+
+;;;; Abbrev mode
+(setq save-abbrevs 'silently)
+(setq-default abbrev-mode t)
+
+;;;; let apropos commands perform more extensive searches than default.
+(setq apropos-do-all t)
+
+;;;; dired
+(setq-default dired-recursive-copies 'always
+	      dired-recursive-deletes 'always
+	      dired-dwim-target t)
+
+;;;; uniquify
+(setq uniquify-buffer-name-style 'forward)
+
+;;;; recentf
+(recentf-mode 1)
+(setq recentf-max-menu-items 15)
+(setq recentf-max-saved-items 500)
+(define-key global-map (kbd "C-x C-r") #'recentf-open-files)
+
+;;;; ibuffer
+(define-key global-map (kbd "C-x C-b") #'ibuffer)
+
+;;;; hippie-expand
+(setq hippie-expand-try-functions-list
+      '(try-expand-dabbrev
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill
+        try-expand-all-abbrevs
+        try-expand-list
+        try-expand-line
+        try-complete-lisp-symbol-partially
+        try-complete-lisp-symbol
+        try-complete-file-name-partially
+        try-complete-file-name))
+(define-key global-map (kbd "M-/") 'hippie-expand)
+
+;;;; these two must be enabled/disabled together
+(setq enable-recursive-minibuffers t)
+(minibuffer-depth-indicate-mode 1)
+
+;;;; icomplete
+(require 'icomplete)
+(with-eval-after-load 'icomplete
+  (setq icomplete-delay-completions-threshold 0)
+  (setq icomplete-max-delay-chars 0)
+  (setq icomplete-compute-delay 0)
+  (setq icomplete-show-matches-on-no-input t)
+  (setq icomplete-hide-common-prefix nil)
+  (setq icomplete-prospects-height 1)
+  (setq icomplete-in-buffer t)
+  (setq icomplete-tidy-shadowed-file-names t)
+
+  (let ((map icomplete-minibuffer-map))
+    (define-key map (kbd "RET") 'icomplete-force-complete-and-exit)
+    (define-key map (kbd "C-n") 'icomplete-forward-completions)
+    (define-key map (kbd "C-p") 'icomplete-backward-completions))
+
+  (icomplete-mode t))
+
+;;; External packages
+
+;;;; lsp-mode setup
+(with-eval-after-load 'lsp-mode
+  (setq lsp-prefer-capf t
+	lsp-pyls-plugins-flake8-enabled t
+	lsp-idle-delay 0.500
+	lsp-enable-snippet nil
+	lsp-eldoc-enable-hover nil
+	lsp-modeline-diagnostics-enable nil
+	lsp-auto-guess-root nil)
+
+  (with-eval-after-load 'js
+    (define-key js-mode-map (kbd "M-.") #'lsp-find-definition)))
+
+;;;; javascript packages setup
+(add-hook 'js-mode-hook #'add-node-modules-path)
+(add-hook 'js-mode-hook #'prettier-js-mode)
+(add-hook 'js-mode-hook #'flymake-eslint-enable)
+(add-hook 'js-mode-hook #'lsp-deferred)
+
+;;;; python setup
+(add-hook 'python-mode-hook #'lsp-deferred)
+
+;;;; magit setup
+(with-eval-after-load 'magit
+  (setq magit-define-global-key-bindings nil))
+
+(define-key global-map (kbd "C-c m s") #'magit-status)
