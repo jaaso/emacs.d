@@ -1,6 +1,6 @@
 ;; -*- coding: utf-8; lexical-binding: t; -*-
 
-;;; Package config
+;;; package config
 
 (setq-default package-quickstart t)
 
@@ -13,7 +13,7 @@
   (package-initialize))
 
 (defvar package-list)
-(setq package-list '(company magit
+(setq package-list '(company magit marginalia
 			     lsp-mode
 			     flymake-eslint prettier-js add-node-modules-path))
 
@@ -24,7 +24,8 @@
   (unless (package-installed-p package)
     (package-install package)))
 
-;;; Base config
+;;; base config
+(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
 (setq-default custom-file (expand-file-name "custom.el" user-emacs-directory))
 
@@ -75,7 +76,7 @@
 
 (put 'set-goal-column 'disabled nil)
 
-;;;; Selection with mouse
+;;;; selection with mouse
 (xterm-mouse-mode t)
 (setq-default mouse-sel-mode t
 	      mouse-scroll-delay 0)
@@ -97,7 +98,7 @@
 	      isearch-lazy-count t
 	      isearch-yank-on-move 'shift)
 
-;;;; Abbrev mode
+;;;; abbrev mode
 (setq save-abbrevs 'silently)
 (setq-default abbrev-mode t)
 
@@ -135,30 +136,20 @@
         try-complete-file-name))
 (define-key global-map (kbd "M-/") 'hippie-expand)
 
-;;;; these two must be enabled/disabled together
+;;;; Minibuffer setup
+
+;;;;; these two must be enabled/disabled together
 (setq enable-recursive-minibuffers t)
 (minibuffer-depth-indicate-mode 1)
 
-;;;; icomplete
-(require 'icomplete)
-(with-eval-after-load 'icomplete
-  (setq icomplete-delay-completions-threshold 0)
-  (setq icomplete-max-delay-chars 0)
-  (setq icomplete-compute-delay 0)
-  (setq icomplete-show-matches-on-no-input t)
-  (setq icomplete-hide-common-prefix nil)
-  (setq icomplete-prospects-height 1)
-  (setq icomplete-in-buffer t)
-  (setq icomplete-tidy-shadowed-file-names t)
+(setq completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
 
-  (let ((map icomplete-minibuffer-map))
-    (define-key map (kbd "RET") 'icomplete-force-complete-and-exit)
-    (define-key map (kbd "C-n") 'icomplete-forward-completions)
-    (define-key map (kbd "C-p") 'icomplete-backward-completions))
+;;;; temp buffer max height
+(setq temp-buffer-max-height 15)
+(temp-buffer-resize-mode)
 
-  (icomplete-mode t))
-
-;;; External packages
+;;; external packages
 
 ;;;; lsp-mode setup
 (with-eval-after-load 'lsp-mode
@@ -187,3 +178,5 @@
   (setq magit-define-global-key-bindings nil))
 
 (define-key global-map (kbd "C-c m s") #'magit-status)
+
+;;; util functions
