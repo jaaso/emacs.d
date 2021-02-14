@@ -13,9 +13,11 @@
 ;; to skip the mtime checks on every *.elc file.
 (setq load-prefer-newer noninteractive)
 
-;; Prevent the glimpse of un-styled Emacs by disabling these UI elements early.
-(push '(tool-bar-lines . 0) default-frame-alist)
-(push '(vertical-scroll-bars) default-frame-alist)
+(if (fboundp 'tool-bar-mode)
+    (tool-bar-mode   -1))
+
+(if (fboundp 'scroll-bar-mode)
+    (scroll-bar-mode -1))
 
 ;; Resizing the Emacs frame can be a terribly expensive part of changing the
 ;; font. By inhibiting this, we easily halve startup times with fonts that are
