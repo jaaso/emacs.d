@@ -13,9 +13,9 @@
   (package-initialize))
 
 (defvar package-list)
-(setq package-list '(company magit marginalia
+(setq package-list '(company magit orderless
 			     lsp-mode
-			     flymake-eslint prettier-js add-node-modules-path))
+			     flymake-eslint prettier-js add-node-modules-path jest))
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -137,17 +137,41 @@
 (define-key global-map (kbd "M-/") 'hippie-expand)
 
 ;;;; Minibuffer setup
-
-;;;;; these two must be enabled/disabled together
+(setq completion-styles '(partial-completion substring flex orderless))
+(setq completion-ignore-case t)
+(setq read-buffer-completion-ignore-case t)
+(setq completions-format 'one-column)
+(setq completions-detailed t)
 (setq enable-recursive-minibuffers t)
 (minibuffer-depth-indicate-mode 1)
 
-(setq completion-ignore-case t)
-(setq read-buffer-completion-ignore-case t)
+;;;; xref
+(setq xref-file-name-display 'project-relative)
+(setq xref-search-program 'ripgrep)
 
-;;;; temp buffer max height
-(setq temp-buffer-max-height 15)
-(temp-buffer-resize-mode)
+;;;; highlight line
+(add-hook 'completion-list-mode-hook #'hl-line-mode)
+
+;;;; display-buffer-alist setup
+
+(setq display-buffer-alist
+      '(
+        ("\\*\\(Help\\|undo-tree\\|lsp-help\\).*"
+         (display-buffer-at-bottom)
+         (window-height . 0.5)
+         (side . bottom)
+         (slot . 0)
+         (window-parameters . ((no-other-window . t))))
+        ;; bottom side window
+        ("\\*\\(Output\\|Register Preview\\|Flow Output\\|copy history\\|jest\\).*"
+         (display-buffer-at-bottom)
+         (window-height . 0.30)
+         (side . bottom)
+         (slot . -1)
+         (window-parameters . ((no-other-window . t))))
+        (".*" (display-buffer-reuse-window
+               display-buffer-same-window)
+         (reusable-frames . visible))))
 
 ;;; external packages
 
@@ -170,6 +194,12 @@
 (add-hook 'js-mode-hook #'flymake-eslint-enable)
 (add-hook 'js-mode-hook #'lsp-deferred)
 
+(with-eval-after-load 'js
+  (require 'jest)
+
+  (setq jest-arguments '("--coverage=false"))
+  (define-key js-mode-map (kbd "C-c t f") #'jest-file))
+
 ;;;; python setup
 (add-hook 'python-mode-hook #'lsp-deferred)
 
@@ -178,5 +208,6 @@
   (setq magit-define-global-key-bindings nil))
 
 (define-key global-map (kbd "C-c m s") #'magit-status)
+(define-key global-map (kbd "<f12>") #'magit-status)
 
 ;;; util functions
