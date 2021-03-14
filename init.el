@@ -13,9 +13,10 @@
   (package-initialize))
 
 (defvar package-list)
-(setq package-list '(company magit orderless
-			     lsp-mode
-			     flymake-eslint prettier-js add-node-modules-path jest))
+(setq package-list '(company magit lsp-mode csv-mode
+			     inf-ruby
+			     pyvenv
+			     flymake-eslint prettier-js add-node-modules-path))
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -68,7 +69,6 @@
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (setq-default display-line-numbers-widen t)
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
@@ -123,6 +123,8 @@
 (define-key global-map (kbd "C-x C-b") #'ibuffer)
 
 ;;;; hippie-expand
+(setq dabbrev-case-replace nil)
+
 (setq hippie-expand-try-functions-list
       '(try-expand-dabbrev
         try-expand-dabbrev-all-buffers
@@ -134,10 +136,10 @@
         try-complete-lisp-symbol
         try-complete-file-name-partially
         try-complete-file-name))
-(define-key global-map (kbd "M-/") 'hippie-expand)
+(define-key global-map (kbd "C-M-/") 'hippie-expand)
 
 ;;;; Minibuffer setup
-(setq completion-styles '(partial-completion substring flex orderless))
+(setq completion-styles '(partial-completion substring flex))
 (setq completion-ignore-case t)
 (setq read-buffer-completion-ignore-case t)
 (setq completions-format 'one-column)
@@ -152,8 +154,17 @@
 ;;;; highlight line
 (add-hook 'completion-list-mode-hook #'hl-line-mode)
 
-;;;; display-buffer-alist setup
+(defun exit-completion-window ()
+  (interactive)
+   (let ((buffer "*Completions*"))
+               (and (get-buffer buffer)
+                    (kill-buffer buffer)))
 
+    (minibuffer-keyboard-quit))
+
+(define-key completion-list-mode-map (kbd "C-g") #'exit-completion-window)
+
+;;;; display-buffer-alist setup
 (setq display-buffer-alist
       '(
         ("\\*\\(Help\\|undo-tree\\|lsp-help\\).*"
@@ -172,6 +183,16 @@
         (".*" (display-buffer-reuse-window
                display-buffer-same-window)
          (reusable-frames . visible))))
+
+;;;; skeletons
+
+(define-skeleton skeloton-print-console-log
+  "console log"
+  ""
+  "console.log("_")")
+
+(define-abbrev-table 'js-mode-abbrev-table
+  '(("clg" "" skeloton-print-console-log 0)))
 
 ;;; external packages
 
@@ -194,20 +215,28 @@
 (add-hook 'js-mode-hook #'flymake-eslint-enable)
 (add-hook 'js-mode-hook #'lsp-deferred)
 
-(with-eval-after-load 'js
-  (require 'jest)
-
-  (setq jest-arguments '("--coverage=false"))
-  (define-key js-mode-map (kbd "C-c t f") #'jest-file))
-
 ;;;; python setup
 (add-hook 'python-mode-hook #'lsp-deferred)
+(add-hook 'python-mode-hook #'pyvenv-mode)
+
+;; ruby setup
+(add-hook 'ruby-mode-hook #'inf-ruby-minor-mode)
 
 ;;;; magit setup
 (with-eval-after-load 'magit
   (setq magit-define-global-key-bindings nil))
 
-(define-key global-map (kbd "C-c m s") #'magit-status)
 (define-key global-map (kbd "<f12>") #'magit-status)
 
 ;;; util functions
+
+(defun goto-line-with-feedback ()
+  "Show line numbers temporarily, while prompting for the line number input"
+  (interactive)
+  (unwind-protect
+      (progn
+        (display-line-numbers-mode 1)
+        (goto-line (read-number "Goto line: ")))
+    (display-line-numbers-mode -1)))
+
+(define-key global-map [remap goto-line] 'goto-line-with-feedback)
