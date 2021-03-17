@@ -13,7 +13,7 @@
   (package-initialize))
 
 (defvar package-list)
-(setq package-list '(company magit lsp-mode csv-mode
+(setq package-list '(company magit lsp-mode
 			     inf-ruby
 			     pyvenv
 			     flymake-eslint prettier-js add-node-modules-path))
@@ -142,6 +142,7 @@
 (setq completion-styles '(partial-completion substring flex))
 (setq completion-ignore-case t)
 (setq read-buffer-completion-ignore-case t)
+(setq read-file-name-completion-ignore-case t)
 (setq completions-format 'one-column)
 (setq completions-detailed t)
 (setq enable-recursive-minibuffers t)
@@ -210,10 +211,10 @@
     (define-key js-mode-map (kbd "M-.") #'lsp-find-definition)))
 
 ;;;; javascript packages setup
-(add-hook 'js-mode-hook #'add-node-modules-path)
 (add-hook 'js-mode-hook #'prettier-js-mode)
 (add-hook 'js-mode-hook #'flymake-eslint-enable)
 (add-hook 'js-mode-hook #'lsp-deferred)
+(add-hook 'js-mode-hook #'add-node-modules-path)
 
 ;;;; python setup
 (add-hook 'python-mode-hook #'lsp-deferred)
