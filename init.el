@@ -13,7 +13,7 @@
   (package-initialize))
 
 (defvar package-list)
-(setq package-list '(company magit lsp-mode
+(setq package-list '(company magit lsp-mode lsp-java
 			     inf-ruby
 			     pyvenv
 			     flymake-eslint prettier-js add-node-modules-path))
@@ -50,6 +50,7 @@
 (line-number-mode t)
 (size-indication-mode t)
 (delete-selection-mode t)
+(blink-cursor-mode 0)
 
 (prefer-coding-system 'utf-8)
 (set-default-coding-systems 'utf-8)
@@ -220,8 +221,11 @@
 (add-hook 'python-mode-hook #'lsp-deferred)
 (add-hook 'python-mode-hook #'pyvenv-mode)
 
-;; ruby setup
+;;;;; ruby setup
 (add-hook 'ruby-mode-hook #'inf-ruby-minor-mode)
+
+;;;; java setup
+(add-hook 'java-mode-hook #'lsp-deferred)
 
 ;;;; magit setup
 (with-eval-after-load 'magit
