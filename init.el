@@ -206,6 +206,7 @@
 	lsp-enable-snippet nil
 	lsp-eldoc-enable-hover nil
 	lsp-modeline-diagnostics-enable nil
+	lsp-headerline-breadcrumb-enable nil
 	lsp-auto-guess-root nil)
 
   (with-eval-after-load 'js
