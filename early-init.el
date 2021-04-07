@@ -25,29 +25,11 @@
 ;; Set default font
 (set-face-attribute 'default nil
                     :family "Inconsolata LGC"
-                    :height 140
+                    :height 130
                     :weight 'normal
                     :width 'normal)
 
-;; set theme
-(load-theme 'deeper-blue t)
-
-(set-face-attribute 'mode-line nil
-		    :background "gray75"
-		    :foreground "black"
-		    :box nil)
-
-(set-face-attribute 'mode-line-buffer-id nil
-		    :foreground "blue4"
-		    :weight 'normal)
-
-(set-face-attribute 'mode-line-inactive nil
-		    :inherit 'mode-line
-		    :background "grey50"
-		    :foreground "grey20"
-		    :box nil
-		    :weight 'normal)
+(load-theme 'modus-operandi t)
 
 (tool-bar-mode   -1)
-
 (scroll-bar-mode -1)

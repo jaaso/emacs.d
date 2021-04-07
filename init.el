@@ -16,7 +16,7 @@
 (setq package-list '(company magit lsp-mode lsp-java
 			     inf-ruby
 			     pyvenv
-			     flymake-eslint prettier-js add-node-modules-path))
+			     jest flymake-eslint prettier-js add-node-modules-path))
 
 (unless package-archive-contents
   (package-refresh-contents))
@@ -126,17 +126,6 @@
 ;;;; hippie-expand
 (setq dabbrev-case-replace nil)
 
-(setq hippie-expand-try-functions-list
-      '(try-expand-dabbrev
-        try-expand-dabbrev-all-buffers
-        try-expand-dabbrev-from-kill
-        try-expand-all-abbrevs
-        try-expand-list
-        try-expand-line
-        try-complete-lisp-symbol-partially
-        try-complete-lisp-symbol
-        try-complete-file-name-partially
-        try-complete-file-name))
 (define-key global-map (kbd "C-M-/") 'hippie-expand)
 
 ;;;; Minibuffer setup
@@ -155,36 +144,6 @@
 
 ;;;; highlight line
 (add-hook 'completion-list-mode-hook #'hl-line-mode)
-
-(defun exit-completion-window ()
-  (interactive)
-   (let ((buffer "*Completions*"))
-               (and (get-buffer buffer)
-                    (kill-buffer buffer)))
-
-    (minibuffer-keyboard-quit))
-
-(define-key completion-list-mode-map (kbd "C-g") #'exit-completion-window)
-
-;;;; display-buffer-alist setup
-(setq display-buffer-alist
-      '(
-        ("\\*\\(Help\\|undo-tree\\|lsp-help\\).*"
-         (display-buffer-at-bottom)
-         (window-height . 0.5)
-         (side . bottom)
-         (slot . 0)
-         (window-parameters . ((no-other-window . t))))
-        ;; bottom side window
-        ("\\*\\(Output\\|Register Preview\\|Flow Output\\|copy history\\|jest\\).*"
-         (display-buffer-at-bottom)
-         (window-height . 0.30)
-         (side . bottom)
-         (slot . -1)
-         (window-parameters . ((no-other-window . t))))
-        (".*" (display-buffer-reuse-window
-               display-buffer-same-window)
-         (reusable-frames . visible))))
 
 ;;;; skeletons
 
@@ -218,6 +177,10 @@
 (add-hook 'js-mode-hook #'lsp-deferred)
 (add-hook 'js-mode-hook #'add-node-modules-path)
 
+(with-eval-after-load 'js
+  (setq jest-arguments '("--coverage=false --watchAll=false"))
+  (define-key js-mode-map (kbd "C-c t f") #'jest-file))
+
 ;;;; python setup
 (add-hook 'python-mode-hook #'lsp-deferred)
 (add-hook 'python-mode-hook #'pyvenv-mode)
@@ -235,14 +198,3 @@
 (define-key global-map (kbd "<f12>") #'magit-status)
 
 ;;; util functions
-
-(defun goto-line-with-feedback ()
-  "Show line numbers temporarily, while prompting for the line number input"
-  (interactive)
-  (unwind-protect
-      (progn
-        (display-line-numbers-mode 1)
-        (goto-line (read-number "Goto line: ")))
-    (display-line-numbers-mode -1)))
-
-(define-key global-map [remap goto-line] 'goto-line-with-feedback)
