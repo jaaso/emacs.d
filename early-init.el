@@ -8,6 +8,10 @@
 ;; enabling `gcmh-mode'. Not resetting it will cause stuttering/freezes.
 (setq gc-cons-threshold most-positive-fixnum)
 
+(setq-default file-name-handler-alist nil
+	      message-log-max 16384
+	      gc-cons-percentage 1.0)
+
 ;; In noninteractive sessions, prioritize non-byte-compiled source files to
 ;; prevent the use of stale byte-code. Otherwise, it saves us a little IO time
 ;; to skip the mtime checks on every *.elc file.
@@ -29,7 +33,7 @@
                     :weight 'normal
                     :width 'normal)
 
-(load-theme 'modus-operandi t)
+(load-theme 'modus-vivendi t)
 
 (tool-bar-mode   -1)
 (scroll-bar-mode -1)

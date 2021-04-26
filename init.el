@@ -27,6 +27,7 @@
 
 ;;; base config
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "site-lisp" user-emacs-directory))
 
 (setq-default custom-file (expand-file-name "custom.el" user-emacs-directory))
 
@@ -68,10 +69,6 @@
 (setq mac-command-modifier 'meta)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
-
-;;;; line numbers for programming modes
-(setq-default display-line-numbers-widen t)
-(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
@@ -132,6 +129,7 @@
 
 ;;;; Minibuffer setup
 ;; (setq completion-styles '(partial-completion substring flex))
+(setq completion-auto-help 'lazy)
 (setq completion-ignore-case t)
 (setq read-buffer-completion-ignore-case t)
 (setq read-file-name-completion-ignore-case t)
@@ -149,17 +147,21 @@
 (setq xref-file-name-display 'project-relative)
 (setq xref-search-program 'ripgrep)
 
+;;;; show line numbers for programming modes
+(setq-default display-line-numbers-widen t)
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
+
 ;;;; highlight line
-(add-hook 'completion-list-mode-hook #'hl-line-mode)
+(add-hook 'completion-list-mode-hook 'hl-line-mode)
 
 ;;;; skeletons
-(define-skeleton skeloton-print-console-log
+(define-skeleton skeleton-print-console-log
   "console log"
   ""
   "console.log("_")")
 
 (define-abbrev-table 'js-mode-abbrev-table
-  '(("clg" "" skeloton-print-console-log 0)))
+  '(("clg" "" skeleton-print-console-log 0)))
 
 ;;;; display-buffer-alist setup
 (setq display-buffer-alist
@@ -194,10 +196,10 @@
 
 ;;;; lsp-mode setup
 (with-eval-after-load 'lsp-mode
-  (setq lsp-prefer-capf t
-	lsp-pyls-plugins-flake8-enabled t
-	lsp-idle-delay 0.500
+  (setq lsp-idle-delay 0.500
 	lsp-enable-snippet nil
+	lsp-enable-file-watchers nil
+	lsp-log-io nil
 	lsp-eldoc-enable-hover nil
 	lsp-modeline-diagnostics-enable nil
 	lsp-headerline-breadcrumb-enable nil
