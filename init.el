@@ -69,7 +69,9 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
+;;;; line numbers for programming modes
 (setq-default display-line-numbers-widen t)
+(add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
@@ -129,7 +131,7 @@
 (define-key global-map (kbd "C-M-/") 'hippie-expand)
 
 ;;;; Minibuffer setup
-(setq completion-styles '(partial-completion substring flex))
+;; (setq completion-styles '(partial-completion substring flex))
 (setq completion-ignore-case t)
 (setq read-buffer-completion-ignore-case t)
 (setq read-file-name-completion-ignore-case t)
@@ -137,6 +139,11 @@
 (setq completions-detailed t)
 (setq enable-recursive-minibuffers t)
 (minibuffer-depth-indicate-mode 1)
+
+;; Do not allow the cursor in the minibuffer prompt
+(setq minibuffer-prompt-properties
+      '(read-only t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
 ;;;; xref
 (setq xref-file-name-display 'project-relative)
@@ -146,7 +153,6 @@
 (add-hook 'completion-list-mode-hook #'hl-line-mode)
 
 ;;;; skeletons
-
 (define-skeleton skeloton-print-console-log
   "console log"
   ""
@@ -155,7 +161,36 @@
 (define-abbrev-table 'js-mode-abbrev-table
   '(("clg" "" skeloton-print-console-log 0)))
 
+;;;; display-buffer-alist setup
+(setq display-buffer-alist
+      '(
+        ("\\*\\(Help\\|undo-tree\\|lsp-help\\).*"
+         (display-buffer-at-bottom)
+         (window-height . 0.5)
+         (side . bottom)
+         (slot . 0)
+         (window-parameters . ((no-other-window . t))))
+        ;; bottom side window
+        ("\\*\\(Output\\|Register Preview\\|Flow Output\\|copy history\\|jest\\).*"
+         (display-buffer-at-bottom)
+         (window-height . 0.30)
+         (side . bottom)
+         (slot . -1)
+         (window-parameters . ((no-other-window . t))))
+        (".*" (display-buffer-reuse-window
+               display-buffer-same-window)
+         (reusable-frames . visible))))
+
 ;;; external packages
+
+;;;; orderless
+(setq completion-styles '(orderless)
+      completion-category-defaults nil
+      completion-category-overrides '((file (styles . (partial-completion)))))
+
+(defun crm-indicator (args)
+  (cons (concat "[CRM] " (car args)) (cdr args)))
+(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
 ;;;; lsp-mode setup
 (with-eval-after-load 'lsp-mode
@@ -194,7 +229,5 @@
 ;;;; magit setup
 (with-eval-after-load 'magit
   (setq magit-define-global-key-bindings nil))
-
-(define-key global-map (kbd "<f12>") #'magit-status)
 
 ;;; util functions
