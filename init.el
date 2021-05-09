@@ -123,7 +123,7 @@
 ;;;; hippie-expand
 (setq dabbrev-case-replace nil)
 
-(define-key global-map (kbd "C-M-/") 'hippie-expand)
+(define-key global-map (kbd "M-/") 'hippie-expand)
 
 ;;;; Minibuffer setup
 (setq completion-styles '(partial-completion substring flex))
@@ -135,11 +135,6 @@
 (setq completions-detailed t)
 (setq enable-recursive-minibuffers t)
 (minibuffer-depth-indicate-mode 1)
-
-;; Do not allow the cursor in the minibuffer prompt
-(setq minibuffer-prompt-properties
-      '(read-only t cursor-intangible t face minibuffer-prompt))
-(add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
 ;;;; xref
 (setq xref-file-name-display 'project-relative)
