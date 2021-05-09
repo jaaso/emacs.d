@@ -185,15 +185,6 @@
 
 ;;; external packages
 
-;;;; orderless
-(setq completion-styles '(orderless)
-      completion-category-defaults nil
-      completion-category-overrides '((file (styles . (partial-completion)))))
-
-(defun crm-indicator (args)
-  (cons (concat "[CRM] " (car args)) (cdr args)))
-(advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
 ;;;; lsp-mode setup
 (with-eval-after-load 'lsp-mode
   (setq lsp-idle-delay 0.500
