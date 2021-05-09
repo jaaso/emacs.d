@@ -28,7 +28,7 @@
 
 ;; Set default font
 (set-face-attribute 'default nil
-                    :family "Inconsolata LGC"
+                    :family "Fira Code"
                     :height 130
                     :weight 'normal
                     :width 'normal)

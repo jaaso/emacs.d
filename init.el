@@ -72,8 +72,6 @@
 
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
-(setq js-indent-level 2)
-
 (put 'set-goal-column 'disabled nil)
 
 ;;;; selection with mouse
@@ -128,7 +126,7 @@
 (define-key global-map (kbd "C-M-/") 'hippie-expand)
 
 ;;;; Minibuffer setup
-;; (setq completion-styles '(partial-completion substring flex))
+(setq completion-styles '(partial-completion substring flex))
 (setq completion-auto-help 'lazy)
 (setq completion-ignore-case t)
 (setq read-buffer-completion-ignore-case t)
@@ -151,7 +149,7 @@
 (setq-default display-line-numbers-widen t)
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
-;;;; highlight line
+;;;; highlight line in completion list
 (add-hook 'completion-list-mode-hook 'hl-line-mode)
 
 ;;;; skeletons
@@ -183,6 +181,11 @@
                display-buffer-same-window)
          (reusable-frames . visible))))
 
+;;; javascript
+(with-eval-after-load 'js
+  (define-key js-mode-map (kbd "M-.") nil)
+  (setq js-indent-level 2))
+
 ;;; external packages
 
 ;;;; lsp-mode setup
@@ -194,10 +197,7 @@
 	lsp-eldoc-enable-hover nil
 	lsp-modeline-diagnostics-enable nil
 	lsp-headerline-breadcrumb-enable nil
-	lsp-auto-guess-root nil)
-
-  (with-eval-after-load 'js
-    (define-key js-mode-map (kbd "M-.") #'lsp-find-definition)))
+	lsp-auto-guess-root nil))
 
 ;;;; javascript packages setup
 (add-hook 'js-mode-hook #'prettier-js-mode)
