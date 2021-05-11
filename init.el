@@ -121,8 +121,16 @@
 (define-key global-map (kbd "C-x C-b") #'ibuffer)
 
 ;;;; hippie-expand
-(setq dabbrev-case-replace nil)
-
+(setq hippie-expand-try-functions-list '(try-expand-dabbrev
+					 try-expand-dabbrev-all-buffers
+					 try-expand-dabbrev-from-kill
+					 try-complete-file-name-partially
+					 try-complete-file-name
+					 try-expand-all-abbrevs
+					 try-expand-list
+					 try-expand-line
+					 try-complete-lisp-symbol-partially
+					 try-complete-lisp-symbol))
 (define-key global-map (kbd "M-/") 'hippie-expand)
 
 ;;;; Minibuffer setup
@@ -142,6 +150,7 @@
 
 ;;;; show line numbers for programming modes
 (setq-default display-line-numbers-widen t)
+(setq-default display-line-numbers-width 4)
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
 ;;;; highlight line in completion list

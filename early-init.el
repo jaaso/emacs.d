@@ -33,7 +33,23 @@
                     :weight 'normal
                     :width 'normal)
 
-(load-theme 'modus-vivendi t)
+(load-theme 'deeper-blue t)
+
+(set-face-attribute 'mode-line nil
+ 		    :background "gray75"
+ 		    :foreground "black"
+ 		    :box nil)
+
+(set-face-attribute 'mode-line-buffer-id nil
+ 		    :foreground "blue4"
+ 		    :weight 'normal)
+
+(set-face-attribute 'mode-line-inactive nil
+ 		    :inherit 'mode-line
+ 		    :background "grey50"
+ 		    :foreground "grey20"
+ 		    :box nil
+ 		    :weight 'normal)
 
 (tool-bar-mode   -1)
 (scroll-bar-mode -1)
